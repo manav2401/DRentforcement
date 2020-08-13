@@ -13,7 +13,7 @@ a. Tech
 b. General
 
 1. Authentication
-    - Authentication in Smart Contracts :How to do that? JWT or not? : [Web3 with Metamask](https://medium.com/@awantoch/how-to-connect-web3-js-to-metamask-in-2020-fee2b2edf58a)
+    - Authentication in Smart Contracts :How to do that? JWT or not?
     - Suggestions: Use mapping in contract for userid and user object. What for token handling?
 2. Basic Functions
     - Basic renting functions.
@@ -35,6 +35,12 @@ b. General
     - Param, Arpan: Go through Web3 in JS and linking with Metamask and contracts.
     - Shyam, Manav: Start developing contracts for User Model (Login and other details)
 
+5. Important Links
+
+    - [Connecting Web3 with Metamask](https://medium.com/@awantoch/how-to-connect-web3-js-to-metamask-in-2020-fee2b2edf58a)
+
+    - [UI/UX Guide for DAPPS and best practices](https://rimble.consensys.design/guides/ux)
+
 ## Updates in next meeting
 
 1. Design updates
@@ -43,3 +49,10 @@ b. General
 4. What about price? In ether or INR?
 5. Will user set price or platform will?
 6. Product addition details required?
+
+> Date: 13 August - 2020 (Thursday) (Things to keep in mind in dapp)
+
+1. Confirm the date/day object in solidity.
+2. Search about the reducing the storage size of array (in case of non active product).
+3. How to deactivate a product after enddate is reached?
+4. Decide which functions will be ownable and what kind of modifiers would be required?
