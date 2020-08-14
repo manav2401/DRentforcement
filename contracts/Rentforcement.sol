@@ -17,7 +17,7 @@ contract Rentforcement {
         string productDesc;         // product description
         uint256 productPrice;       // price of product per day in wei (1 ether = 10^18 wei)
         address productOwner;       // Owner of the product
-        uint32 lastDateAvailable;  // storing the last date until which the product is available
+        uint32 lastDateAvailable;   // storing the last date until which the product is available
         bool isAvailableNow;        // Is product available now i.e. is product active
         bool[] isAvailable;         // Array containing per day availability of product
     }
@@ -26,6 +26,9 @@ contract Rentforcement {
 
     // mapping of productid with product object
     mapping(uint256 => Product) public products;
+
+    // mapping of user address with product count
+    mapping(address => uint32) public userProductCount;
 
     // Add emit events here
 
@@ -47,6 +50,9 @@ contract Rentforcement {
 
         // add object to permanant storage
         products[productId] = product;
+
+        // increment count to product count mapping
+        userProductCount[msg.sender] += 1;
 
         // emit event here
 
@@ -116,7 +122,7 @@ contract Rentforcement {
     function fetchAllProducts() external view returns(Product[] memory) {
 
         // Declaring a new array in memory (nothing is stored in storage)
-        // No gas used for external view function        
+        // No gas used for external view function
         Product[] memory allProducts = new Product[](productId);
         uint256 counter = 0;
 
@@ -141,5 +147,31 @@ contract Rentforcement {
      * Used in dashboard
      * Returns products which are owned by user calling the function
      */
-     // add function here
+    function fetchMyProducts() external view returns(Product[] memory) {
+
+        require(
+            userProductCount[msg.sender] > 0,
+            "you don't have any product"
+        );
+
+        // Declaring a new array in memory (nothing is stored in storage)
+        // No gas used for external view function
+        Product[] memory myProducts = new Product[](userProductCount[msg.sender]);
+        uint256 counter = 0;
+
+        // iterating over the product mapping
+        for (uint256 i=0; i<productId; i++) {
+            
+            // checking owner
+            if (products[i].productOwner == msg.sender) {
+                
+                // adding the specific product to array
+                myProducts[counter] = products[i];
+                counter += 1;
+            }
+        }
+
+        return myProducts;
+
+    }
 }
