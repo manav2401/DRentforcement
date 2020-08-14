@@ -55,6 +55,57 @@ contract Rentforcement {
 
     }
 
+    // Modifier to check whether product on rent is active or not
+    modifier isProductActive(bool _isAvailableNow) {
+        require(_isAvailableNow);
+        _;
+    }
+
+    // Another Modifier to check whether product has expired or not
+
+    /**
+     * Function to edit product on rent
+     * Can only be done by Owner
+     * Uses modifier isProductActive
+     * INPUT PARAMS
+     * _id: The ID of product
+     * _updatedName: Updated name of product
+     * _updatedDesc: Updated description of product
+     * _updatedNumberOfDays: Updated number of days, product is available on rent
+     * _updatedPerDayPrice: Updated Per day price of product
+     */
+    function editProductOnRent(uint256 _id, string memory _updatedName, string memory _updatedDesc, uint32 _updatedNumberOfDays, uint256 _updatedPerDayPrice) external isProductActive(products[_id].isAvailableNow) {
+
+        // Assert that property is only edited by owner and not by any external contract
+        require(
+            products[_id].productOwner == msg.sender,
+            "you don't have edit access"
+        );
+
+        // Calculate the new enddate
+        uint32 endDate = uint32(block.timestamp + _updatedNumberOfDays);
+
+        // Assert that number of days are not reduced
+        require(
+            endDate < products[_id].lastDateAvailable,
+            "sorry, you can't decrease the available days on rent"
+        );
+
+        // Make new memory array for storing 
+        bool[] memory newIsAvailable = new bool[](_updatedNumberOfDays);
+        for (uint32 i=0; i<products[_id].isAvailable.length; i++) {
+            newIsAvailable[i] = products[_id].isAvailable[i];
+        }
+
+        // update product instance
+        products[_id].productName = _updatedName;
+        products[_id].productDesc = _updatedDesc;
+        products[_id].productPrice = _updatedPerDayPrice;
+        products[_id].lastDateAvailable = endDate;
+        products[_id].isAvailable = newIsAvailable;
+
+    }
+
     // Function to borrow product here
 
     /**
