@@ -1,0 +1,35 @@
+.App {
+  text-align: center;
+  background-color: #282c34;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.metamask-login-button {
+  size: 10px;
+  font-size: calc(10px + 2vmin);
+  background-color: #282c34;
+  color: white;  
+}
+
+.fetch-number-button {
+  size: 10px;
+  font-size: calc(10px + 2vmin);
+  background-color: #282c34;
+  color: white;  
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

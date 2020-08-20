@@ -11,6 +11,9 @@ pragma experimental ABIEncoderV2;
 
 contract Rentforcement {
 
+    // dummy variable
+    uint dummy = 0;
+
     // Product structure
     struct Product {
         string productName;         // name of product
@@ -174,4 +177,15 @@ contract Rentforcement {
         return myProducts;
 
     }
+
+    /**
+     * Dummy function for testing
+     */
+     function getDummy() external view returns(uint) {
+         return dummy;
+     }
+
+     function setDummy(uint x) external {
+         dummy = x;
+     }
 }

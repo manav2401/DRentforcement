@@ -57,3 +57,19 @@ b. General
 3. How to deactivate a product after enddate is reached?
 4. Decide which functions will be ownable and what kind of modifiers would be required?
 5. Add validations for reducing or incrementing the number of days available on rent.
+
+> Date: 18th August - 2020 (Tuesday)
+
+## Functionalities to add (To be done by 19th August)
+
+1. Frontend
+    - Metamask login and generate transaction.
+    - Local Storage of JWT Token
+2. Backend
+    - Define User Schema
+    - Connect with Contract using web3.js
+    - JWT Based authentication and API's in NodeJS
+    - Transaction validation
+3. Contracts
+    - Define user schema
+    - Functions for profile additions and updates
