@@ -19,7 +19,7 @@ class App extends Component {
     const provider = await detectEthereumProvider();
 
     if (provider) {
-      this.fetchWalletDetails(provider);
+      await this.fetchWalletDetails(provider);
     } else {
       window.alert('Please install MetaMask!');
       return;
@@ -36,10 +36,28 @@ class App extends Component {
         // allowing user to connect and fetch accounts
         const accounts = await provider.request({ method: 'eth_requestAccounts' });
         userAccount = accounts[0];
+        
+        // personal message sign
+        web3 = new Web3(provider);  // create a new web3 instance
+
+        var message = "Hello friend, Please sign this message!";
+
+        var result = await web3.eth.personal.sign(
+          message, 
+          userAccount, 
+          function (err, result) {
+            if (err) return console.log('error: ' + err);
+          }
+        );
+
+        console.log('Result received: ' + result);
+
+        // set the state
         this.setState({ loading: true });
 
       } catch (error) {
         // the case if user denies account access
+        console.log('Error: ' + error)
         alert('Please create / select a wallet account to proceed further!');
       }
     }
@@ -50,7 +68,7 @@ class App extends Component {
     try {
       const provider = await detectEthereumProvider();
       web3 = new Web3(provider);
-      
+
       var rentforcementContract = new web3.eth.Contract(abi, address);
       try {
         const result = await rentforcementContract.methods.getDummy().call();  
