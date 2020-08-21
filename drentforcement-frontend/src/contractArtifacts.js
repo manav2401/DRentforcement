@@ -1,5 +1,6 @@
 module.exports = {
-    address: `0x1A3e1e2c558DAA3805aC3F375AAc6651f70eE9F8`,
+    // address: `0xA7aFEe592B42Fb12a4D0913cF172A6a32Aa00C46`,
+    address: "0x4c5f42e3d858B4B355EDF052Be766bfE8834b904",
     abi: [
         {
           "inputs": [],
@@ -12,7 +13,8 @@ module.exports = {
             }
           ],
           "stateMutability": "view",
-          "type": "function"
+          "type": "function",
+          "constant": true
         },
         {
           "inputs": [
@@ -56,7 +58,8 @@ module.exports = {
             }
           ],
           "stateMutability": "view",
-          "type": "function"
+          "type": "function",
+          "constant": true
         },
         {
           "inputs": [
@@ -75,7 +78,8 @@ module.exports = {
             }
           ],
           "stateMutability": "view",
-          "type": "function"
+          "type": "function",
+          "constant": true
         },
         {
           "inputs": [
@@ -192,7 +196,8 @@ module.exports = {
             }
           ],
           "stateMutability": "view",
-          "type": "function"
+          "type": "function",
+          "constant": true
         },
         {
           "inputs": [],
@@ -242,7 +247,8 @@ module.exports = {
             }
           ],
           "stateMutability": "view",
-          "type": "function"
+          "type": "function",
+          "constant": true
         },
         {
           "inputs": [],
@@ -255,7 +261,8 @@ module.exports = {
             }
           ],
           "stateMutability": "view",
-          "type": "function"
+          "type": "function",
+          "constant": true
         },
         {
           "inputs": [

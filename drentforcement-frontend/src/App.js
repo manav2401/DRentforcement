@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Web3 from 'web3';
 import { address, abi } from './contractArtifacts';
 import './App.css';
 
@@ -6,6 +7,7 @@ import './App.css';
 import detectEthereumProvider from '@metamask/detect-provider';
 
 var userAccount = undefined;
+var web3 = undefined;
 
 class App extends Component {
 
@@ -43,14 +45,15 @@ class App extends Component {
     }
   }
 
-  /*
   fetchNumber = async () => {
 
     try {
       const provider = await detectEthereumProvider();
-      var rentforcementContract = new provider.ethereum.Contract(abi, address);
+      web3 = new Web3(provider);
+      
+      var rentforcementContract = new web3.eth.Contract(abi, address);
       try {
-        const result = rentforcementContract.methods.getDummy().call();  
+        const result = await rentforcementContract.methods.getDummy().call();  
         console.log('Number Fetched: ' + result);
       } catch (error) {
         console.log('error: ' + error)
@@ -64,7 +67,7 @@ class App extends Component {
       return;
     }
     
-  }*/
+  }
 
   render() {
     const { loading } = this.state;
@@ -75,9 +78,9 @@ class App extends Component {
           {loading ? `Connected ${userAccount}` : 'Login with metamask'}
         </button>
 
-        {/* <button className="fetch-number-button" onClick={this.fetchNumber}> */}
-          {/* {loading ? `Fetch Number` : `Disabled`} */}
-        {/* </button> */}
+        <button className="fetch-number-button" onClick={this.fetchNumber}>
+          {loading ? `Fetch Number` : `Disabled`}
+        </button>
 
       </div>
     )
