@@ -47,26 +47,44 @@ class Dashboard extends React.Component {
                 this.setState({ isValid: true });
 
                 // fetch accounts
-                const accounts = await provider.request({ method: 'eth_requestAccounts' });
-                userAccount = accounts[0];
-                console.log('Account fetched: ' + userAccount);
+
+                // const accounts = await provider.request({ method: 'eth_requestAccounts' });
+                // userAccount = accounts[0];
+                // console.log('Account fetched: ' + userAccount);
 
                 // check here if account already exists or not;
                 // if exists: skip personal message sign;
-                // if not: make user sign
+                // if not: make user sign;
 
                 web3 = new Web3(provider);
                 var rentforcementContract = new web3.eth.Contract(abi, address);
 
+                try {
+                    const result = await rentforcementContract.methods.checkIfUserExists().call();
+                    console.log('Account fetched(yes/no): ' + result);
+                } catch (error) {
+                    console.log('error: ' + error);
+                    window.alert('Error in calling contract function!');
+                    return;
+                }
+
+                this.setState({ isAuth: true });
+
             }
         
-        } else {
+        }
+        else {
             this.setState({ isMetamaskInstalled: false });
             window.alert('Please install MetaMask!');
             return;
         }
 
 
+    }
+
+    handleAccountsChanged(accounts) {
+        userAccount = accounts[0];
+        console.log('Account fetched: ' + userAccount);
     }
 
     render() {

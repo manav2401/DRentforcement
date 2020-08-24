@@ -39,9 +39,12 @@ contract Rentforcement {
     }
 
     uint256 public productId;
-    // uint256 public userId;
+    uint256 public userId;
 
-    // mapping of userid with user object
+    // mapping of userid with useraddress
+    mapping(uint256 => address) public userAddress;
+
+    // mapping of address with user object
     mapping(address => User) public users;
 
     // mapping of productid with product object
@@ -71,15 +74,20 @@ contract Rentforcement {
          string memory _userState
      ) public returns(bool) {
 
-         // creating an object
-         User memory _user = User(
+        // creating an object
+        User memory _user = User(
             _userName, _userEmail, _userPhone, _userAddress, _userCity, _userState, true
-         );
+        );
 
          // saving to mapping
+        userAddress[userId] = msg.sender;
         users[msg.sender] = _user;
+        
 
         // emit event here
+
+        // increment the user count
+        userId += 1;
 
      }
 
@@ -235,6 +243,20 @@ contract Rentforcement {
             return true;
         }
     }
+
+    // fetch all users
+    function fetchAllUsers() external view returns(User[] memory) {
+        User[] memory allUsers = new User[](userId);
+        uint256 counter = 0;
+
+        for (uint256 i=0; i<userId; i++) {
+            allUsers[counter] = users[userAddress[i]];
+            counter += 1;
+        }
+        return allUsers;
+    }
+
+    
 
     /**
      * Dummy function for testing
