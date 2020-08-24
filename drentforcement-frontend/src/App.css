@@ -1,14 +1,16 @@
 .App {
   text-align: center;
-  background-color: #282c34;
+}
+
+.message {
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: #282c34;
 }
 
 .metamask-login-button {
-  size: 10px;
-  font-size: calc(10px + 2vmin);
-  background-color: #282c34;
+  text-align: center;
+  size: 15px;
+  font-size: calc(12px + 2vmin);
   color: white;  
 }
 
@@ -19,7 +21,7 @@
   color: white;  
 }
 
-@media (prefers-reduced-motion: no-preference) {
+/*@media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
   }
@@ -33,3 +35,4 @@
     transform: rotate(360deg);
   }
 }
+*/

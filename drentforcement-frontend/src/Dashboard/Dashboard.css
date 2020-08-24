@@ -1,0 +1,23 @@
+.Dashboard {
+    text-align: center;
+  }
+  
+.message {
+    font-size: calc(10px + 2vmin);
+    color: #282c34;
+}
+  
+.metamask-login-button {
+    text-align: center;
+    size: 15px;
+    font-size: calc(12px + 2vmin);
+    color: white;  
+}
+  
+.fetch-number-button {
+    size: 10px;
+    font-size: calc(10px + 2vmin);
+    background-color: #282c34;
+    color: white;  
+}
+  
