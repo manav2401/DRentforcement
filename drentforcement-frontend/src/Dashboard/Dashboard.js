@@ -1,18 +1,27 @@
 // imports
 import React, { Component } from 'react';
 import Web3 from 'web3';
-import Button from '@material-ui/core/Button';
+// import ethers from 'ethers';
+// import Button from '@material-ui/core/Button';
 import detectEthereumProvider from '@metamask/detect-provider';
-import { Redirect } from 'react-router-dom';
+// import { Redirect } from 'react-router-dom';
 
 // local imports
-// import { address, abi } from '../contractArtifacts';
+import { address, abi } from '../contractArtifacts';
 import './Dashboard.css';
 
 // local variables
 var web3 = undefined;
 var userAccount = undefined;
 
+/**
+ * checks in dashboard
+ * 1. check for provider
+ * 2. set required flag if not found
+ * 3. fetch account function
+ * 4 .case1: if accounts fetched: use them 
+ * 5. case2: if accounts not fetched: popup
+ */
 class Dashboard extends React.Component {
 
     state = {
@@ -33,20 +42,26 @@ class Dashboard extends React.Component {
                 return;
     
             } else {
-                console.log('Single account!');
-                this.state({ isValid: true });
-                var connected = provider.isConnected();
-                if (connected) {
-                    this.state({ isAuth: true });
-                    // fetch accounts and perform actions
-                } else {
-                    this.state({ isAuth: false });
-                    // redirect to another page
-                }
+
+                console.log('Single wallet!');
+                this.setState({ isValid: true });
+
+                // fetch accounts
+                const accounts = await provider.request({ method: 'eth_requestAccounts' });
+                userAccount = accounts[0];
+                console.log('Account fetched: ' + userAccount);
+
+                // check here if account already exists or not;
+                // if exists: skip personal message sign;
+                // if not: make user sign
+
+                web3 = new Web3(provider);
+                var rentforcementContract = new web3.eth.Contract(abi, address);
+
             }
         
         } else {
-            this.state({ isMetamaskInstalled: false });
+            this.setState({ isMetamaskInstalled: false });
             window.alert('Please install MetaMask!');
             return;
         }
@@ -55,7 +70,7 @@ class Dashboard extends React.Component {
     }
 
     render() {
-        this.componentDidMount();
+        // this.componentDidMount();
         const { isValid } = this.state;
         const { isAuth } = this.state;
         const { isMetamaskInstalled } = this.state;

@@ -14,6 +14,19 @@ contract Rentforcement {
     // dummy variable
     uint dummy = 0;
 
+    // user structure
+    struct User {
+
+        string userName;
+        string userEmail;
+        string userPhone;
+        string userAddress;
+        string userCity;
+        string userState;
+        bool isValid;
+        
+    }
+
     // Product structure
     struct Product {
         string productName;         // name of product
@@ -26,6 +39,10 @@ contract Rentforcement {
     }
 
     uint256 public productId;
+    // uint256 public userId;
+
+    // mapping of userid with user object
+    mapping(address => User) public users;
 
     // mapping of productid with product object
     mapping(uint256 => Product) public products;
@@ -34,6 +51,38 @@ contract Rentforcement {
     mapping(address => uint32) public userProductCount;
 
     // Add emit events here
+
+    /**
+     * Function to add new users
+     * INPUT PARAMS
+     * string userName;
+     * string userEmail;
+     * string userPhone;
+     * string userAddress;
+     * string userCity;
+     * string userState;
+     */
+     function createNewUser(
+         string memory _userName,
+         string memory _userEmail,
+         string memory _userPhone,
+         string memory _userAddress,
+         string memory _userCity,
+         string memory _userState
+     ) public returns(bool) {
+
+         // creating an object
+         User memory _user = User(
+            _userName, _userEmail, _userPhone, _userAddress, _userCity, _userState, true
+         );
+
+         // saving to mapping
+        users[msg.sender] = _user;
+
+        // emit event here
+
+     }
+
 
     /**
      * Function for adding product on rent
@@ -176,6 +225,15 @@ contract Rentforcement {
 
         return myProducts;
 
+    }
+
+    // function to check whether user exists or not
+    function checkIfUserExists() external view returns(bool) {
+        if (keccak256(abi.encodePacked(users[msg.sender].userName)) == keccak256(abi.encodePacked(""))) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     /**

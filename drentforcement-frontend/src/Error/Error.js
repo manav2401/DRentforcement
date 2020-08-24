@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import Web3 from 'web3';
-import { address, abi } from '../contractArtifacts';
+// import Web3 from 'web3';
+// import { address, abi } from '../contractArtifacts';
 import './Error.css';
 
 class Profile extends Component {
