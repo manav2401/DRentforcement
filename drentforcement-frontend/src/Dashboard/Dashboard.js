@@ -45,30 +45,43 @@ class Dashboard extends React.Component {
 
                 console.log('Single wallet!');
                 this.setState({ isValid: true });
+                web3 = new Web3(provider);
 
                 // fetch accounts
 
                 // const accounts = await provider.request({ method: 'eth_requestAccounts' });
-                // userAccount = accounts[0];
-                // console.log('Account fetched: ' + userAccount);
+                try {
+                    const accounts = await web3.eth.getAccounts();
+                    userAccount = accounts[0];
+                    console.log('Account fetched: ' + userAccount);
+
+                    var rentforcementContract = new web3.eth.Contract(abi, address);
+                    console.log('debug1')
+
+                    try {
+                        console.log('debug2')
+                        const result = await rentforcementContract.methods.checkIfUserExists().call();
+                        console.log('debug3')
+                        console.log('Account fetched(yes/no): ' + result);
+                    } catch (error) {
+                        console.log('error: ' + error);
+                        window.alert('Error in calling contract function!');
+                        return;
+                    }
+    
+                    this.setState({ isAuth: true });    
+
+                } catch (error) {
+                    console.log('error: ' + error);
+                    window.alert('Error in fetching accounts!');
+                    return;
+                }
+                
 
                 // check here if account already exists or not;
                 // if exists: skip personal message sign;
                 // if not: make user sign;
-
-                web3 = new Web3(provider);
-                var rentforcementContract = new web3.eth.Contract(abi, address);
-
-                try {
-                    const result = await rentforcementContract.methods.checkIfUserExists().call();
-                    console.log('Account fetched(yes/no): ' + result);
-                } catch (error) {
-                    console.log('error: ' + error);
-                    window.alert('Error in calling contract function!');
-                    return;
-                }
-
-                this.setState({ isAuth: true });
+                
 
             }
         
