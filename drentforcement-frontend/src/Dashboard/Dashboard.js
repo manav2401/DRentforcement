@@ -4,6 +4,7 @@ import Web3 from 'web3';
 // import ethers from 'ethers';
 // import Button from '@material-ui/core/Button';
 import detectEthereumProvider from '@metamask/detect-provider';
+
 // import { Redirect } from 'react-router-dom';
 
 // local imports
@@ -11,6 +12,7 @@ import { address, abi } from '../contractArtifacts';
 import './Dashboard.css';
 
 // local variables
+var sigUtil = require('eth-sig-util')
 var web3 = undefined;
 var userAccount = undefined;
 
@@ -30,6 +32,31 @@ class Dashboard extends React.Component {
         isMetamaskInstalled: false,
     };
 
+    async validateUser() {
+        var message = "Hello friend, Please sign this message! Your one time random nonce is " + Math.random();
+        var result = await web3.eth.personal.sign(
+          message,
+          userAccount,
+          function (err, result) {
+            if (err) return console.log('error: ' + err);
+          }
+        );
+
+        const msgParams = { data: message }
+        msgParams.sig = result
+        const recovered = sigUtil.recoverPersonalSignature(msgParams)
+
+        if (recovered === userAccount) {
+            console.log('Verified!');
+            return true;
+        } else {
+            console.log('Unable to verify');
+            return false;
+        }
+
+    }
+
+
     async componentDidMount() {
         const provider = await detectEthereumProvider();
 
@@ -48,21 +75,35 @@ class Dashboard extends React.Component {
                 web3 = new Web3(provider);
 
                 // fetch accounts
-
-                // const accounts = await provider.request({ method: 'eth_requestAccounts' });
                 try {
-                    const accounts = await web3.eth.getAccounts();
+                    var accounts = await provider.request({ method: 'eth_requestAccounts' });
+                    accounts = await web3.eth.getAccounts();
                     userAccount = accounts[0];
                     console.log('Account fetched: ' + userAccount);
 
-                    var rentforcementContract = new web3.eth.Contract(abi, address);
-                    console.log('debug1')
+                    var rentforcementContract = new web3.eth.Contract(
+                        abi, 
+                        address, 
+                        {gasPrice: '12345678', from: userAccount}
+                    );
 
                     try {
-                        console.log('debug2')
-                        const result = await rentforcementContract.methods.checkIfUserExists().call();
-                        console.log('debug3')
+                        var result = await rentforcementContract.methods.checkIfUserExists().call();
                         console.log('Account fetched(yes/no): ' + result);
+                        if (!result) {
+                            try {
+                                const isUserValid = await this.validateUser();
+                                this.setState({ isAuth: isUserValid });
+                            } catch(error) {
+                                console.log('Error: ' + error);
+                                window.alert('Error in validating user!');
+                            }
+                            
+                            // set flag here
+                        } else {
+                            this.setState({ isAuth: true });
+                        }
+                        
                     } catch (error) {
                         console.log('error: ' + error);
                         window.alert('Error in calling contract function!');
@@ -76,12 +117,6 @@ class Dashboard extends React.Component {
                     window.alert('Error in fetching accounts!');
                     return;
                 }
-                
-
-                // check here if account already exists or not;
-                // if exists: skip personal message sign;
-                // if not: make user sign;
-                
 
             }
         
@@ -95,11 +130,6 @@ class Dashboard extends React.Component {
 
     }
 
-    handleAccountsChanged(accounts) {
-        userAccount = accounts[0];
-        console.log('Account fetched: ' + userAccount);
-    }
-
     render() {
         // this.componentDidMount();
         const { isValid } = this.state;
@@ -111,7 +141,6 @@ class Dashboard extends React.Component {
                 if (!isAuth) {
                     return (
                         <div className="Dashboard">
-                            {/* <Redirect to="/auth" /> */}
                             <h3>Redirect</h3>
                         </div>
                     )

@@ -237,11 +237,12 @@ contract Rentforcement {
 
     // function to check whether user exists or not
     function checkIfUserExists() external view returns(bool) {
-        if (keccak256(abi.encodePacked(users[msg.sender].userName)) == keccak256(abi.encodePacked(""))) {
+        return users[msg.sender].isValid;
+        /*if (keccak256(abi.encodePacked(users[msg.sender].userName)) == keccak256(abi.encodePacked(""))) {
             return false;
         } else {
             return true;
-        }
+        }*/
     }
 
     // fetch all users
