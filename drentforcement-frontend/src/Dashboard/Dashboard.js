@@ -1,8 +1,6 @@
 // imports
 import React, { Component } from 'react';
 import Web3 from 'web3';
-// import ethers from 'ethers';
-// import Button from '@material-ui/core/Button';
 import detectEthereumProvider from '@metamask/detect-provider';
 
 // import { Redirect } from 'react-router-dom';
@@ -58,6 +56,7 @@ class Dashboard extends React.Component {
 
 
     async componentDidMount() {
+        
         const provider = await detectEthereumProvider();
 
         if (provider) {
