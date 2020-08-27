@@ -162,6 +162,8 @@ contract Rentforcement {
 
         // Incrementing the product ID
         productId += 1;
+
+        return true;
     }
 
     // Modifier to check whether product on rent is active or not

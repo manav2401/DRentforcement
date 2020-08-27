@@ -6,10 +6,28 @@ import './Auth.css';
 
 class Auth extends Component {
 
+    constructor(props) {
+        super(props);
+        this.state = {
+            dummyVar: true,
+        }
+    }
+
     render() {
+
+        const { dummyVar } = this.state;
+
+        var script;
+        if (dummyVar) {
+            script = <h2>Hello</h2>
+        } else {
+            script = <h2>Bye</h2>
+        }
+
         return (
             <div>
                 <p>Hello auth!</p>
+                {script}
             </div>
         )
     }

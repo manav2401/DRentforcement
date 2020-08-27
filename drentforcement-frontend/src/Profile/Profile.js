@@ -342,8 +342,6 @@ class Profile extends React.Component {
                                 <Button variant="contained" color="primary" onClick={this.onProfileSave}>
                                     Save
                                 </Button>
-                            </div>
-                            <div className="profile-update-message">
                                 {isUpdatedMessage}
                             </div>
                         </div>
