@@ -1,5 +1,5 @@
 module.exports = {
-  address: "0x1e5F2BECcDD2abeD3344ECa43D12717dFec5B4d6",
+  address: "0x43A350885B0576991DDE5fc5Df3F9B996310EF62",
   abi: [
     {
       "inputs": [
@@ -108,7 +108,13 @@ module.exports = {
         }
       ],
       "name": "editProductOnRent",
-      "outputs": [],
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
       "stateMutability": "nonpayable",
       "type": "function"
     },
@@ -122,6 +128,50 @@ module.exports = {
       ],
       "name": "setDummy",
       "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "_userName",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_userEmail",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_userPhone",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_userAddress",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_userCity",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_userState",
+          "type": "string"
+        }
+      ],
+      "name": "updateUser",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
       "stateMutability": "nonpayable",
       "type": "function"
     },
@@ -194,6 +244,11 @@ module.exports = {
       "outputs": [
         {
           "components": [
+            {
+              "internalType": "address",
+              "name": "userAccountAddress",
+              "type": "address"
+            },
             {
               "internalType": "string",
               "name": "userName",
@@ -294,6 +349,11 @@ module.exports = {
       "outputs": [
         {
           "components": [
+            {
+              "internalType": "address",
+              "name": "userAccountAddress",
+              "type": "address"
+            },
             {
               "internalType": "string",
               "name": "userName",
@@ -469,6 +529,11 @@ module.exports = {
       ],
       "name": "users",
       "outputs": [
+        {
+          "internalType": "address",
+          "name": "userAccountAddress",
+          "type": "address"
+        },
         {
           "internalType": "string",
           "name": "userName",

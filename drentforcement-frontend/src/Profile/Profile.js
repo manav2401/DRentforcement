@@ -10,6 +10,7 @@ import './Profile.css';
 var sigUtil = require('eth-sig-util')
 var web3 = undefined;
 var userAccount = undefined;
+var rentforcementContract = undefined;
 
 class Profile extends React.Component {
 
@@ -24,7 +25,8 @@ class Profile extends React.Component {
             contact: "",
             address: "",
             city: "",
-            state: ""
+            state: "",
+            isProfileUpdated: false
         };
 
         this.handleUsernameChange = this.handleUsernameChange.bind(this);
@@ -90,7 +92,7 @@ class Profile extends React.Component {
                     userAccount = accounts[0];
                     console.log('Account fetched: ' + userAccount);
 
-                    var rentforcementContract = new web3.eth.Contract(
+                    rentforcementContract = new web3.eth.Contract(
                         abi,
                         address,
                         { gasPrice: '12345678', from: userAccount }
@@ -174,6 +176,45 @@ class Profile extends React.Component {
 
     }
 
+    async saveProfileDetails() {
+
+        if (rentforcementContract) {
+
+            try {
+
+                var profielUpdated = await rentforcementContract.methods.createNewUser(
+                    this.state.username,
+                    this.state.emailaddress,
+                    this.state.contact,
+                    this.state.address,
+                    this.state.city,
+                    this.state.state
+                ).send();
+
+                console.log('Is profile updated: ' + profielUpdated);
+                if (profielUpdated) {
+                    this.setState({ isProfileUpdated: true });
+                } else {
+                    // not gonna happen! (contract always returns true)
+                    // still
+                    this.setState({ isProfileUpdated: false });
+
+                }
+
+            } catch (error) {
+                // error in saving!
+                console.log('error: ' + error);
+                console.log('Error in calling profile update contract!');
+                this.setState({ isProfileUpdated: true });
+            }
+
+        } else {
+            // undefined!
+            console.log('Contract instance undefined!');
+        }
+
+    }
+
     handleUsernameChange(e) {
         this.setState({ username: e.target.value });
     }
@@ -198,7 +239,7 @@ class Profile extends React.Component {
         this.setState({ state: e.target.value });
     }
 
-    onProfileSave() {
+    async onProfileSave() {
 
         console.log("details saved!")
         console.log(this.state.username)
@@ -211,6 +252,8 @@ class Profile extends React.Component {
         // contract call
         // to update the details!
 
+        await this.saveProfileDetails();
+
     }
 
     render() {
@@ -218,6 +261,14 @@ class Profile extends React.Component {
         const { isValid } = this.state;
         const { isAuth } = this.state;
         const { isMetamaskInstalled } = this.state;
+        const { isProfileUpdated } = this.state;
+
+        var isUpdatedMessage;
+        if (isProfileUpdated) {
+            isUpdatedMessage = <h2>Profile updated!</h2>
+        } else {
+            isUpdatedMessage = <h2></h2>
+        }
 
         if (isMetamaskInstalled) {
             if (isValid) {
@@ -246,8 +297,10 @@ class Profile extends React.Component {
                                 <br></br><br></br>
                                 <Button variant="contained" color="primary" onClick={this.onProfileSave}>
                                     Save
-                            </Button>
-
+                                </Button>
+                            </div>
+                            <div className="profile-update-message">
+                                {isUpdatedMessage}
                             </div>
                         </div>
 

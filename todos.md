@@ -1,75 +1,40 @@
 # D-Rentforcement
 
-> Date: 10 August - 2020 (Monday) Meeting Reports (5.30 PM)
+> Things Completed
 
-## Things to discuss
+1. Contract side
+    - Profile / User creation
+    - Profile / User updation
+    - Fetching User/s according to address
+    - Products addition
+    - Products updation
 
-a. Tech
+2. Frontend side
+    - AUTH Functions (account link + fetch + validate)
+    - Profile basic form
+    - Profile/user details fetch
+    - Profile/user update
 
-1. Decide the frontend stack and some suggestions for UI: Finalize designs
+> Things Left
 
-2. Get familiar with smart contracts and solidity
+1. Contract side
+    - Borrowing product (with all conditions)
+    - Order structure and other related functions
+    - Transactions handling in orders
 
-b. General
+2. Frontend side
+    - Profile/user addition (for new users) (using flag / something else)
+    - Product Addition / updation / fetch (form + contract call)
+    - Dashboard basic functions (account/profile + products)
+    - Redirecting in each page and forwarding to profile page (with all conditions)
+    - Order booking (transactions handling)
+    - Personal/sensitive details view after booking
+    - Order return (if possible and returns)
 
-1. Authentication
-    - Authentication in Smart Contracts :How to do that? JWT or not?
-    - Suggestions: Use mapping in contract for userid and user object. What for token handling?
-2. Basic Functions
-    - Basic renting functions.
-    - Discuss about user hierchy: Both at same level
-    - Renting terms and details needed.
-    - Dashboard details and other things.
+3. General
+    - What about transaction and deposit amout?
 
-3. Decisions taken
-    - Common Login for every type of user
-    - Identity proof for user? Aadhar Validation? Phone validation? Search and ask to mentors.
-    - Look about image storage in solidity and blockchain.
-    - Common dashboard for both users if not logged in.
-    - Products of user is not to be shown to user iteself.
-    - Seperate form for product addition.
+> Things which can be done if time persists
 
-4. Tasks Distributed
-    - Meet, Param, Arpan: Webpage design
-    - Meet: Aadhar/OTP API in JavaScript
-    - Param, Arpan: Go through Web3 in JS and linking with Metamask and contracts.
-    - Shyam, Manav: Start developing contracts for User Model (Login and other details)
-
-5. Important Links
-
-    - [Connecting Web3 with Metamask](https://medium.com/@awantoch/how-to-connect-web3-js-to-metamask-in-2020-fee2b2edf58a)
-
-    - [UI/UX Guide for DAPPS and best practices](https://rimble.consensys.design/guides/ux)
-
-## Updates in next meeting
-
-1. Design updates
-2. Web3 interaction
-3. Contracts
-4. What about price? In ether or INR?
-5. Will user set price or platform will?
-6. Product addition details required?
-
-> Date: 13 August - 2020 (Thursday) (Things to keep in mind in dapp)
-
-1. Confirm the date/day object in solidity.
-2. Search about the reducing the storage size of array (in case of non active product).
-3. How to deactivate a product after enddate is reached?
-4. Decide which functions will be ownable and what kind of modifiers would be required?
-5. Add validations for reducing or incrementing the number of days available on rent.
-
-> Date: 18th August - 2020 (Tuesday)
-
-## Functionalities to add (To be done by 19th August)
-
-1. Frontend
-    - Metamask login and generate transaction.
-    - Local Storage of JWT Token
-2. Backend
-    - Define User Schema
-    - Connect with Contract using web3.js
-    - JWT Based authentication and API's in NodeJS
-    - Transaction validation
-3. Contracts
-    - Define user schema
-    - Functions for profile additions and updates
+- Cart
+- Staking of products
