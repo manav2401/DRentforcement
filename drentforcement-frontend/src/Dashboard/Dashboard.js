@@ -97,9 +97,8 @@ class Dashboard extends React.Component {
                                 console.log('Error: ' + error);
                                 window.alert('Error in validating user!');
                             }
-                            
-                            // set flag here
                         } else {
+                            // user already validated
                             this.setState({ isAuth: true });
                         }
                         
@@ -108,8 +107,6 @@ class Dashboard extends React.Component {
                         window.alert('Error in calling contract function!');
                         return;
                     }
-    
-                    this.setState({ isAuth: true });    
 
                 } catch (error) {
                     console.log('error: ' + error);

@@ -257,7 +257,10 @@ contract Rentforcement {
         return allUsers;
     }
 
-    
+    // fetch a particular user profile
+    function fetchUserProfle() external view returns(User memory) {
+        return users[msg.sender];
+    }
 
     /**
      * Dummy function for testing

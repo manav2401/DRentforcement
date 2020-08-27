@@ -33,18 +33,22 @@ class Profile extends React.Component {
         this.handleAddressChange = this.handleAddressChange.bind(this);
         this.handleCityChange = this.handleCityChange.bind(this);
         this.handleStateChange = this.handleStateChange.bind(this);
-        this.onProfileSubmit = this.onProfileSubmit.bind(this);
+        this.onProfileSave = this.onProfileSave.bind(this);
 
     }
 
     async validateUser() {
         var message = "Hello friend, Please sign this message! Your one time random nonce is " + Math.random();
         var result = await web3.eth.personal.sign(
-          message,
-          userAccount,
-          function (err, result) {
-            if (err) return console.log('error: ' + err);
-          }
+            message,
+            userAccount,
+            function (err, result) {
+                if (err) {
+                    console.log('Unable to create personal sign message!');
+                    console.log('error: ' + err);
+                    return false;
+                }
+            }
         );
 
         const msgParams = { data: message }
@@ -62,7 +66,7 @@ class Profile extends React.Component {
     }
 
     async componentDidMount() {
-        
+
         const provider = await detectEthereumProvider();
 
         if (provider) {
@@ -72,7 +76,7 @@ class Profile extends React.Component {
                 this.setState({ isValid: false })
                 alert('Multiple wallets are installed!');
                 return;
-    
+
             } else {
 
                 console.log('Single wallet!');
@@ -87,9 +91,9 @@ class Profile extends React.Component {
                     console.log('Account fetched: ' + userAccount);
 
                     var rentforcementContract = new web3.eth.Contract(
-                        abi, 
-                        address, 
-                        {gasPrice: '12345678', from: userAccount}
+                        abi,
+                        address,
+                        { gasPrice: '12345678', from: userAccount }
                     );
 
                     try {
@@ -99,23 +103,58 @@ class Profile extends React.Component {
                             try {
                                 const isUserValid = await this.validateUser();
                                 this.setState({ isAuth: isUserValid });
-                            } catch(error) {
+                            } catch (error) {
                                 console.log('Error: ' + error);
                                 window.alert('Error in validating user!');
                             }
-                            
-                            // set flag here
                         } else {
+                            // user already validated
                             this.setState({ isAuth: true });
                         }
-                        
+
                     } catch (error) {
                         console.log('error: ' + error);
-                        window.alert('Error in calling contract function!');
+                        console.log('Error in calling check user exists function!');
+                        // window.alert('Error in calling contract function!');
                         return;
                     }
-    
-                    this.setState({ isAuth: true });    
+
+                    if (this.state.isAuth) {
+                        // contract call for fetching profile!
+                        try {
+
+                            var fetchedUserProfile = await rentforcementContract.methods.fetchUserProfle().call();
+                            console.log('type: ' + typeof fetchedUserProfile);
+                            console.log(fetchedUserProfile);
+
+                            try {
+                                this.setState({ username: fetchedUserProfile["userName"] });
+                                this.setState({ emailaddress: fetchedUserProfile["userEmail"] });
+                                this.setState({ contact: fetchedUserProfile["userPhone"] });
+                                this.setState({ address: fetchedUserProfile["userAddress"] });
+                                this.setState({ city: fetchedUserProfile["userCity"] });
+                                this.setState({ state: fetchedUserProfile["userState"] });
+
+                            } catch (error) {
+                                // unable to fetch details!
+                                console.log('Unable to parse details! Error in fetching!');
+                            }
+
+                            /*
+                            // not implemented in soldity yet!
+                            if (fetchedUserProfile["isProfileComplete"]) {
+                                // can skip this page, if called from other page!
+                                // need to show, if called from profile page
+                            } else {
+                                // need to show in any condition
+                                this.setState()
+                            }*/
+
+                        } catch (error) {
+                            console.log('error: ' + error)
+                            console.log('Error in calling fetch profile function!');
+                        }
+                    }
 
                 } catch (error) {
                     console.log('error: ' + error);
@@ -124,7 +163,7 @@ class Profile extends React.Component {
                 }
 
             }
-        
+
         }
         else {
             this.setState({ isMetamaskInstalled: false });
@@ -150,7 +189,7 @@ class Profile extends React.Component {
     handleAddressChange(e) {
         this.setState({ address: e.target.value });
     }
-    
+
     handleCityChange(e) {
         this.setState({ city: e.target.value });
     }
@@ -159,7 +198,7 @@ class Profile extends React.Component {
         this.setState({ state: e.target.value });
     }
 
-    onProfileSubmit() {
+    onProfileSave() {
 
         console.log("details saved!")
         console.log(this.state.username)
@@ -170,8 +209,7 @@ class Profile extends React.Component {
         console.log(this.state.state)
 
         // contract call
-        // const provider = await detectEthereumProvider();
-
+        // to update the details!
 
     }
 
@@ -186,33 +224,33 @@ class Profile extends React.Component {
                 if (!isAuth) {
                     return (
                         <div className="Dashboard">
-                            <h3>Please connect your metamask account in order to use this dapp!</h3>
+                            <h3>Please validate your metamask wallet account in order to proceed!</h3>
                         </div>
                     )
                 } else {
                     return (
                         <div className="profile-main">
-                        <h2>Profile!</h2>
-                        <div className="profile-form" autoComplete="off">
-                            <TextField id="standard-basic" label="Name" value={this.state.username} onChange={this.handleUsernameChange}/>
-                            <br></br><br></br>
-                            <TextField id="standard-basic" label="Email Address" value={this.state.emailaddress} onChange={this.handleEmailChange}/>
-                            <br></br><br></br>
-                            <TextField id="standard-basic" label="Contact Number" value={this.state.contact} onChange={this.handleContactChange}/>
-                            <br></br><br></br>
-                            <TextField id="standard-basic" label="Address" value={this.state.address} onChange={this.handleAddressChange}/>
-                            <br></br><br></br>
-                            <TextField id="standard-basic" label="City" value={this.state.city} onChange={this.handleCityChange}/>
-                            <br></br><br></br>
-                            <TextField id="standard-basic" label="State" value={this.state.state} onChange={this.handleStateChange}/>
-                            <br></br><br></br>
-                            <Button variant="contained" color="primary" onClick={this.onProfileSubmit}>
-                                Submit
+                            <h2>Profile!</h2>
+                            <div className="profile-form" autoComplete="off">
+                                <TextField id="standard-basic" label="Name" value={this.state.username} onChange={this.handleUsernameChange} />
+                                <br></br><br></br>
+                                <TextField id="standard-basic" label="Email Address" value={this.state.emailaddress} onChange={this.handleEmailChange} />
+                                <br></br><br></br>
+                                <TextField id="standard-basic" label="Contact Number" value={this.state.contact} onChange={this.handleContactChange} />
+                                <br></br><br></br>
+                                <TextField id="standard-basic" label="Address" value={this.state.address} onChange={this.handleAddressChange} />
+                                <br></br><br></br>
+                                <TextField id="standard-basic" label="City" value={this.state.city} onChange={this.handleCityChange} />
+                                <br></br><br></br>
+                                <TextField id="standard-basic" label="State" value={this.state.state} onChange={this.handleStateChange} />
+                                <br></br><br></br>
+                                <Button variant="contained" color="primary" onClick={this.onProfileSave}>
+                                    Save
                             </Button>
-        
+
+                            </div>
                         </div>
-                    </div>
-                
+
                     )
                 }
             } else {

@@ -1,5 +1,5 @@
 module.exports = {
-  address: "0x7C988C91BD768885ee792904A871927e6BaB329D",
+  address: "0x1e5F2BECcDD2abeD3344ECa43D12717dFec5B4d6",
   abi: [
     {
       "inputs": [
@@ -283,6 +283,56 @@ module.exports = {
           "internalType": "struct Rentforcement.Product[]",
           "name": "",
           "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "fetchUserProfle",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "userName",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "userEmail",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "userPhone",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "userAddress",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "userCity",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "userState",
+              "type": "string"
+            },
+            {
+              "internalType": "bool",
+              "name": "isValid",
+              "type": "bool"
+            }
+          ],
+          "internalType": "struct Rentforcement.User",
+          "name": "",
+          "type": "tuple"
         }
       ],
       "stateMutability": "view",
