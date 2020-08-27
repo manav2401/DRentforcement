@@ -8,6 +8,7 @@ import detectEthereumProvider from '@metamask/detect-provider';
 import './Profile.css';
 
 var sigUtil = require('eth-sig-util')
+var ethUtil = require('ethereumjs-util');
 var web3 = undefined;
 var userAccount = undefined;
 var rentforcementContract = undefined;
@@ -40,7 +41,8 @@ class Profile extends React.Component {
     }
 
     async validateUser() {
-        var message = "Hello friend, Please sign this message! Your one time random nonce is " + Math.random();
+        const nonce = Math.round(Math.random() * 100 + Math.random() * 100);
+        var message = "Hello friend, Please sign this message! Your one time random nonce is " + nonce;
         var result = await web3.eth.personal.sign(
             message,
             userAccount,
@@ -57,7 +59,10 @@ class Profile extends React.Component {
         msgParams.sig = result
         const recovered = sigUtil.recoverPersonalSignature(msgParams)
 
-        if (recovered === userAccount) {
+        console.log('recovered: ' + recovered);
+        console.log('user account: ' + userAccount);
+
+        if (recovered.toLowerCase() === userAccount.toLowerCase()) {
             console.log('Verified!');
             return true;
         } else {
@@ -95,7 +100,7 @@ class Profile extends React.Component {
                     rentforcementContract = new web3.eth.Contract(
                         abi,
                         address,
-                        { gasPrice: '12345678', from: userAccount }
+                        { gasPrice: '20000000000', from: userAccount }
                     );
 
                     try {
@@ -122,6 +127,7 @@ class Profile extends React.Component {
                     }
 
                     if (this.state.isAuth) {
+
                         // contract call for fetching profile!
                         try {
 
@@ -130,12 +136,50 @@ class Profile extends React.Component {
                             console.log(fetchedUserProfile);
 
                             try {
-                                this.setState({ username: fetchedUserProfile["userName"] });
-                                this.setState({ emailaddress: fetchedUserProfile["userEmail"] });
-                                this.setState({ contact: fetchedUserProfile["userPhone"] });
-                                this.setState({ address: fetchedUserProfile["userAddress"] });
-                                this.setState({ city: fetchedUserProfile["userCity"] });
-                                this.setState({ state: fetchedUserProfile["userState"] });
+
+                                // case1:
+                                // if any one field is empty: profile incomplete
+                                // if redirected or not, stay on page
+
+                                // case2:
+                                // if none field is empty: profile complete
+                                // if redirected: leave page
+                                // if not: stay on page
+
+                                var isProfileComplete = true;
+
+                                if (
+                                    fetchedUserProfile["userName"] == "" || 
+                                    fetchedUserProfile["userEmail"] == "" ||
+                                    fetchedUserProfile["userPhone"] == "" ||
+                                    fetchedUserProfile["userAddress"] == "" ||
+                                    fetchedUserProfile["userCity"] == "" ||
+                                    fetchedUserProfile["userState"] == ""
+                                ) {
+                                    isProfileComplete = false;
+                                }
+
+                                if (isProfileComplete) {
+                                    // if redirected, should go back there again
+                                    // currently, not redirected again
+                                    this.setState({ username: fetchedUserProfile["userName"] });
+                                    this.setState({ emailaddress: fetchedUserProfile["userEmail"] });
+                                    this.setState({ contact: fetchedUserProfile["userPhone"] });
+                                    this.setState({ address: fetchedUserProfile["userAddress"] });
+                                    this.setState({ city: fetchedUserProfile["userCity"] });
+                                    this.setState({ state: fetchedUserProfile["userState"] });
+
+                                } else {
+
+                                    this.setState({ username: fetchedUserProfile["userName"] });
+                                    this.setState({ emailaddress: fetchedUserProfile["userEmail"] });
+                                    this.setState({ contact: fetchedUserProfile["userPhone"] });
+                                    this.setState({ address: fetchedUserProfile["userAddress"] });
+                                    this.setState({ city: fetchedUserProfile["userCity"] });
+                                    this.setState({ state: fetchedUserProfile["userState"] });
+    
+                                }
+
 
                             } catch (error) {
                                 // unable to fetch details!
