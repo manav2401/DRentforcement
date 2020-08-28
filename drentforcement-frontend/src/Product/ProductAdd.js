@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
@@ -12,6 +12,8 @@ var ethUtil = require('ethereumjs-util');
 var web3 = undefined;
 var userAccount = undefined;
 var rentforcementContract = undefined;
+var uploadImage = undefined;
+var convertBase64 = undefined;
 
 class ProductAdd extends Component {
 
@@ -28,15 +30,43 @@ class ProductAdd extends Component {
             productNumberOfDays: "",
             isUserProfileComplete: false,
             isProductAdded: false,
+            baseImage: "",
+            setBaseImage: ""
         };
+
+        // const [baseImage, setBaseImage] = useState("");
 
         this.handleProductNameChange = this.handleProductNameChange.bind(this);
         this.handleProductDescChange = this.handleProductDescChange.bind(this);
         this.handleProductPriceChange = this.handleProductPriceChange.bind(this);
         this.handleProductNumberOfDaysChange = this.handleProductNumberOfDaysChange.bind(this);
         this.onProductAdd = this.onProductAdd.bind(this);
+        this.uploadImage = this.uploadImage.bind(this);
 
     }
+
+    async uploadImage(e) {
+        const file = e.target.files[0];
+        const base64 = await this.convertBase64(file);
+        // setBaseImage(base64);
+        console.log('image uploaded: ' + base64);
+        this.setState({ setBaseImage: base64 });
+    };
+    
+    convertBase64 = (file) => {
+        return new Promise((resolve, reject) => {
+            const fileReader = new FileReader();
+            fileReader.readAsDataURL(file);
+    
+            fileReader.onload = () => {
+                resolve(fileReader.result);
+            };
+    
+            fileReader.onerror = (error) => {
+                reject(error);
+            };
+        });
+    };
 
     async validateUser() {
 
@@ -202,14 +232,15 @@ class ProductAdd extends Component {
 
             try {
 
-                const price = +(this.state.productPrice);
-                var priceInWei = web3.utils.toWei(price, 'ether');
+                const price = this.state.productPrice;
+                var priceInWei = +(web3.utils.toWei(price, 'ether'));
+                const numOfDays = +(this.state.productNumberOfDays) >>> 0;
 
                 var productAdded = await rentforcementContract.methods.addProductOnRent(
                     this.state.productName,
                     this.state.productDesc,
-                    this.state.priceInWei,
-                    +(this.state.productNumberOfDays),
+                    numOfDays,
+                    priceInWei,
                 ).send();
 
                 console.log('Is product added: ' + productAdded);
@@ -271,7 +302,8 @@ class ProductAdd extends Component {
 
     render() {
 
-        const { isValid, isAuth, isMetamaskInstalled, isUserProfileComplete, isProductAdded } = this.state;
+        const { isValid, isAuth, isMetamaskInstalled, isUserProfileComplete, isProductAdded, baseImage } = this.state;
+        const { setBaseImage } = this.state
 
         var script;
         if (isProductAdded) {
@@ -305,6 +337,9 @@ class ProductAdd extends Component {
                                     <br></br><br></br>
                                     <TextField id="standard-basic" label="Number of days available" value={this.state.productNumberOfDays} onChange={this.handleProductNumberOfDaysChange} />
                                     <br></br><br></br>
+                                    <input type = "file" onChange = {(e) => {this.uploadImage(e);}}/>
+                                    <br></br><br></br>
+                                    <img src={`${setBaseImage}`} />
                                     <Button variant="contained" color="primary" onClick={this.onProductAdd}>
                                         Save
                                     </Button>
