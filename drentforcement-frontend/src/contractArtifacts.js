@@ -1,5 +1,5 @@
 module.exports = {
-  address: "0xF42f88e43eD9f256F9d4f1fd519BC9f6BE15E755",
+  address: "0x51F35DF19dD15B9F466bF8C6bF86327fC9FC6e2b",
   abi: [
     {
       "inputs": [
@@ -33,6 +33,19 @@ module.exports = {
         }
       ],
       "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "checkIfUserExists",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -116,76 +129,6 @@ module.exports = {
         }
       ],
       "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "x",
-          "type": "uint256"
-        }
-      ],
-      "name": "setDummy",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "string",
-          "name": "_userName",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "_userEmail",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "_userPhone",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "_userAddress",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "_userCity",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "_userState",
-          "type": "string"
-        }
-      ],
-      "name": "updateUser",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "checkIfUserExists",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -466,6 +409,63 @@ module.exports = {
         }
       ],
       "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "x",
+          "type": "uint256"
+        }
+      ],
+      "name": "setDummy",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "_userName",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_userEmail",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_userPhone",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_userAddress",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_userCity",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_userState",
+          "type": "string"
+        }
+      ],
+      "name": "updateUser",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
