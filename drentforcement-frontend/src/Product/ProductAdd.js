@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
@@ -12,6 +12,29 @@ var ethUtil = require('ethereumjs-util');
 var web3 = undefined;
 var userAccount = undefined;
 var rentforcementContract = undefined;
+
+const [baseImage, setBaseImage] = useState("");
+
+const uploadImage = async(e) => {
+    const file = e.target.files[0];
+    const base64 = await convertBase64(file);
+    setBaseImage(base64);
+};
+
+const convertBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+        const fileReader = new FileReader();
+        fileReader.readAsDataURL(file);
+
+        fileReader.onload = () => {
+            resolve(fileReader.result);
+        };
+
+        fileReader.onerror = (error) => {
+            reject(error);
+        };
+    });
+};
 
 class ProductAdd extends Component {
 
@@ -45,7 +68,7 @@ class ProductAdd extends Component {
         var result = await web3.eth.personal.sign(
             message,
             userAccount,
-            function (err, result) {
+            function(err, result) {
                 if (err) {
                     console.log('Unable to create personal sign message!');
                     console.log('error: ' + err);
@@ -98,8 +121,7 @@ class ProductAdd extends Component {
 
                     rentforcementContract = new web3.eth.Contract(
                         abi,
-                        address,
-                        { gasPrice: '20000000000', from: userAccount }
+                        address, { gasPrice: '20000000000', from: userAccount }
                     );
 
                     try {
@@ -183,8 +205,7 @@ class ProductAdd extends Component {
 
             }
 
-        }
-        else {
+        } else {
             this.setState({ isMetamaskInstalled: false });
             window.alert('Please install MetaMask!');
             return;
@@ -208,8 +229,7 @@ class ProductAdd extends Component {
                 var productAdded = await rentforcementContract.methods.addProductOnRent(
                     this.state.productName,
                     this.state.productDesc,
-                    this.state.priceInWei,
-                    +(this.state.productNumberOfDays),
+                    this.state.priceInWei, +(this.state.productNumberOfDays),
                 ).send();
 
                 console.log('Is product added: ' + productAdded);
@@ -304,6 +324,12 @@ class ProductAdd extends Component {
                                     <TextField id="standard-basic" label="Per Day Price of Product in Ethers" value={this.state.productPrice} onChange={this.handleProductPriceChange} />
                                     <br></br><br></br>
                                     <TextField id="standard-basic" label="Number of days available" value={this.state.productNumberOfDays} onChange={this.handleProductNumberOfDaysChange} />
+                                    <br></br><br></br>
+                                    <input type = "file" onChange = {(e) => {uploadImage(e);}}/>
+                                    <br></br><br></br>
+                                    <img src = { baseImage } height = "200px" />
+                                    <br></br><br></br>
+                                    baseImage
                                     <br></br><br></br>
                                     <Button variant="contained" color="primary" onClick={this.onProductAdd}>
                                         Save
