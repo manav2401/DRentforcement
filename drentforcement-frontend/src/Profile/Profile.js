@@ -326,7 +326,7 @@ class Profile extends React.Component {
                     return (
                         // <!-- Latest compiled and minified CSS -->
                         <div className="profile-main">
-                            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"></link>
+                            {/* <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"></link> */}
                             <h2>Profile!</h2>
                             <div className="profile-form" autoComplete="off">
                                 <TextField id="standard-basic" label="Name" value={this.state.username} onChange={this.handleUsernameChange} />
@@ -347,7 +347,7 @@ class Profile extends React.Component {
                                 <button type="button" class="btn btn-success">Success</button>
                                 {isUpdatedMessage}
                             </div>
-                            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+                            {/* <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script> */}
                         </div>
                         // <!-- Latest compiled and minified JavaScript -->
 

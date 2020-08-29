@@ -1,5 +1,6 @@
 import React, { Component, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import {BrowserRouter as Router,  Redirect } from 'react-router-dom';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Web3 from 'web3';
@@ -24,6 +25,7 @@ class ProductAdd extends Component {
             isAuth: false,
             isValid: false,
             isMetamaskInstalled: false,
+            toRedirect: false,
             productName: "",
             productDesc: "",
             productPrice: "",
@@ -31,7 +33,7 @@ class ProductAdd extends Component {
             isUserProfileComplete: false,
             isProductAdded: false,
             baseImage: "",
-            setBaseImage: ""
+            setBaseImage: "",
         };
 
         // const [baseImage, setBaseImage] = useState("");
@@ -68,39 +70,6 @@ class ProductAdd extends Component {
         });
     };
 
-    async validateUser() {
-
-        const nonce = Math.round(Math.random() * 100 + Math.random() * 100);
-        var message = "Hello friend, Please sign this message! Your one time random nonce is " + nonce;
-        var result = await web3.eth.personal.sign(
-            message,
-            userAccount,
-            function (err, result) {
-                if (err) {
-                    console.log('Unable to create personal sign message!');
-                    console.log('error: ' + err);
-                    return false;
-                }
-            }
-        );
-
-        const msgParams = { data: message }
-        msgParams.sig = result
-        const recovered = sigUtil.recoverPersonalSignature(msgParams)
-
-        console.log('recovered: ' + recovered);
-        console.log('user account: ' + userAccount);
-
-        if (recovered.toLowerCase() === userAccount.toLowerCase()) {
-            console.log('Verified!');
-            return true;
-        } else {
-            console.log('Unable to verify');
-            return false;
-        }
-
-    }
-
     async componentDidMount() {
 
         const provider = await detectEthereumProvider();
@@ -136,13 +105,11 @@ class ProductAdd extends Component {
                         var result = await rentforcementContract.methods.checkIfUserExists().call();
                         console.log('Account fetched(yes/no): ' + result);
                         if (!result) {
-                            try {
-                                const isUserValid = await this.validateUser();
-                                this.setState({ isAuth: isUserValid });
-                            } catch (error) {
-                                console.log('Error: ' + error);
-                                window.alert('Error in validating user!');
-                            }
+                            // redirect user to profile page
+                            // for validation
+                            // and profile completion
+                            this.setState({ isAuth: false });
+                            this.setState({ isUserProfileComplete: false });                            
                         } else {
                             // user already validated
                             this.setState({ isAuth: true });
@@ -184,11 +151,10 @@ class ProductAdd extends Component {
                                 }
 
                                 if (isProfileComplete) {
-                                    // continue with form!
+                                    // continue with product add form!
                                     this.setState({ isUserProfileComplete: true });
                                 } else {
                                     // redirect to profile
-                                    // not added yet!
                                     this.setState({ isUserProfileComplete: false });
                                 }
 
@@ -314,55 +280,47 @@ class ProductAdd extends Component {
 
         if (isMetamaskInstalled) {
             if (isValid) {
-                if (!isAuth) {
+
+                // auth is already true in this case
+                if (isUserProfileComplete) {
                     return (
-                        <div className="Dashboard">
-                            <h3>Please validate your metamask wallet account in order to proceed!</h3>
+                        <div className="product-add">
+                            <h2>Rent @ Rentforcement</h2>
+                            <h3>Just fill in some basic info and you're good to go!</h3>
+
+                            <div className="product-add-form" autoComplete="off">
+                                <TextField id="standard-basic" label="Product Name" value={this.state.productName} onChange={this.handleProductNameChange} />
+                                <br></br><br></br>
+                                <TextField id="standard-basic" label="Product Description" multiline rowsMax={4} value={this.state.productDesc} onChange={this.handleProductDescChange} />
+                                <br></br><br></br>
+                                <TextField id="standard-basic" label="Per Day Price of Product in Ethers" value={this.state.productPrice} onChange={this.handleProductPriceChange} />
+                                <br></br><br></br>
+                                <TextField id="standard-basic" label="Number of days available" value={this.state.productNumberOfDays} onChange={this.handleProductNumberOfDaysChange} />
+                                <br></br><br></br>
+                                <input type = "file" onChange = {(e) => {this.uploadImage(e);}}/>
+                                <br></br><br></br>
+                                <img src={`${setBaseImage}`} />
+                                <Button variant="contained" color="primary" onClick={this.onProductAdd}>
+                                    Save
+                                </Button>
+                            </div>
+
+                            <div className="add-note">
+                                <h3>Kindly note that your product will be available on rent, from this time onwards!</h3>
+                            </div>
+
+                            {script}
+
                         </div>
                     )
                 } else {
-
-                    if (isUserProfileComplete) {
-                        return (
-                            <div className="product-add">
-                                <h2>Rent @ Rentforcement</h2>
-                                <h3>Just fill in some basic info and you're good to go!</h3>
-
-                                <div className="product-add-form" autoComplete="off">
-                                    <TextField id="standard-basic" label="Product Name" value={this.state.productName} onChange={this.handleProductNameChange} />
-                                    <br></br><br></br>
-                                    <TextField id="standard-basic" label="Product Description" multiline rowsMax={4} value={this.state.productDesc} onChange={this.handleProductDescChange} />
-                                    <br></br><br></br>
-                                    <TextField id="standard-basic" label="Per Day Price of Product in Ethers" value={this.state.productPrice} onChange={this.handleProductPriceChange} />
-                                    <br></br><br></br>
-                                    <TextField id="standard-basic" label="Number of days available" value={this.state.productNumberOfDays} onChange={this.handleProductNumberOfDaysChange} />
-                                    <br></br><br></br>
-                                    <input type = "file" onChange = {(e) => {this.uploadImage(e);}}/>
-                                    <br></br><br></br>
-                                    <img src={`${setBaseImage}`} />
-                                    <Button variant="contained" color="primary" onClick={this.onProductAdd}>
-                                        Save
-                                    </Button>
-                                </div>
-
-                                <div className="add-note">
-                                    <h3>Kindly note that your product will be available on rent, from this time onwards!</h3>
-                                </div>
-
-                                {script}
-
-                            </div>
-                        )
-                    } else {
-                        // redirect
-                        return (
-                            <h2>
-                                Redirect to profile section!
-                            </h2>
-                        )
-                    }
-
+                    return (
+                        <Router>
+                            <Redirect to='/profile'/>
+                        </Router>                            
+                    )
                 }
+
             } else {
                 return (
                     <div className="Dashboard">
