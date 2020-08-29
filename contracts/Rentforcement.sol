@@ -1,15 +1,14 @@
 // SPDX-License-Identifier: MIT
 
-/**
- * DRentforcement
- * A Decentralized C2C Renting Platform
- * Contract for basic renting functions
- */
+// DRentforcement
+// A Decentralized C2C Renting Platform
+// Contract for basic renting functions
 
 pragma solidity ^0.7.0;
 pragma experimental ABIEncoderV2;
 
 contract Rentforcement {
+
     // dummy variable
     uint256 dummy = 0;
 
@@ -27,15 +26,17 @@ contract Rentforcement {
 
     // Product structure
     struct Product {
-        string productName; // name of product
-        string productDesc; // product description
-        uint256 productPrice; // price of product per day in wei (1 ether = 10^18 wei)
-        address productOwner; // Owner of the product
-        uint32 lastDateAvailable; // storing the last date until which the product is available
-        bool isAvailableNow; // Is product available now i.e. is product active
-        bool[] isAvailable; // Array containing per day availability of product
+        string productName;         // name of product
+        string productDesc;         // product description
+        uint256 productPrice;       // price of product per day in wei (1 ether = 10^18 wei)
+        string productImage;        // image of product
+        address productOwner;       // Owner of the product
+        uint32 lastDateAvailable;   // storing the last date until which the product is available
+        bool isAvailableNow;        // Is product available now i.e. is product active
+        bool[] isAvailable;         // Array containing per day availability of product
     }
 
+    // ID's for product and user
     uint256 public productId;
     uint256 public userId;
 
@@ -53,16 +54,15 @@ contract Rentforcement {
 
     // Add emit events here
 
-    /**
-     * Function to add new users
-     * INPUT PARAMS
-     * string userName;
-     * string userEmail;
-     * string userPhone;
-     * string userAddress;
-     * string userCity;
-     * string userState;
-     */
+    // Function to add new users
+    // INPUT PARAMS
+    // string userName;
+    // string userEmail;
+    // string userPhone;
+    // string userAddress;
+    // string userCity;
+    // string userState;
+
     function createNewUser(
         string memory _userName,
         string memory _userEmail,
@@ -71,6 +71,7 @@ contract Rentforcement {
         string memory _userCity,
         string memory _userState
     ) public returns (bool) {
+
         // creating an object
         User memory _user = User(
             msg.sender,
@@ -91,15 +92,18 @@ contract Rentforcement {
 
         // increment the user count
         userId += 1;
-
         return true;
+
     }
 
+    // modifier for checking user validity
     modifier isUserValid(address userAdd) {
         require(users[userAdd].isValid);
         _;
     }
 
+    // Function for updating user
+    // INPUT Params: updated user fields
     function updateUser(
         string memory _userName,
         string memory _userEmail,
@@ -108,6 +112,7 @@ contract Rentforcement {
         string memory _userCity,
         string memory _userState
     ) external isUserValid(msg.sender) returns (bool) {
+
         address sender = msg.sender;
         require(
             users[sender].userAccountAddress == sender,
@@ -124,20 +129,20 @@ contract Rentforcement {
         return true;
     }
 
-    /**
-     * Function for adding product on rent
-     * INPUT PARAMS
-     * _productName: Name of product
-     * _productDesc: Description of product
-     * _numberOfDays: Number of days, product is available on rent
-     * _perDayPrice: Per day price of product
-     */
+    // Function for adding product on rent
+    // INPUT PARAMS
+    // _productName: Name of product
+    // _productDesc: Description of product
+    // _numberOfDays: Number of days, product is available on rent
+    // _perDayPrice: Per day price of product
     function addProductOnRent(
         string memory _productName,
         string memory _productDesc,
         uint32 _numberOfDays,
-        uint256 _perDayPrice
+        uint256 _perDayPrice,
+        string memory _productImage
     ) public returns (bool) {
+
         // calculating the enddate
         uint32 endDate = uint32(block.timestamp + _numberOfDays);
 
@@ -146,6 +151,7 @@ contract Rentforcement {
             _productName,
             _productDesc,
             _perDayPrice,
+            _productImage,
             msg.sender,
             endDate,
             true,
@@ -162,8 +168,8 @@ contract Rentforcement {
 
         // Incrementing the product ID
         productId += 1;
-
         return true;
+
     }
 
     // Modifier to check whether product on rent is active or not
@@ -174,24 +180,25 @@ contract Rentforcement {
 
     // Another Modifier to check whether product has expired or not
 
-    /**
-     * Function to edit product on rent
-     * Can only be done by Owner
-     * Uses modifier isProductActive
-     * INPUT PARAMS
-     * _id: The ID of product
-     * _updatedName: Updated name of product
-     * _updatedDesc: Updated description of product
-     * _updatedNumberOfDays: Updated number of days, product is available on rent
-     * _updatedPerDayPrice: Updated Per day price of product
-     */
+    // Function to edit product on rent
+    // Can only be done by Owner
+    // Uses modifier isProductActive
+    // INPUT PARAMS
+    // _id: The ID of product
+    // _updatedName: Updated name of product
+    // _updatedDesc: Updated description of product
+    // _updatedNumberOfDays: Updated number of days, product is available on rent
+    // _updatedPerDayPrice: Updated Per day price of product
+
     function editProductOnRent(
         uint256 _id,
         string memory _updatedName,
         string memory _updatedDesc,
         uint32 _updatedNumberOfDays,
-        uint256 _updatedPerDayPrice
+        uint256 _updatedPerDayPrice,
+        string memory _updatedProductImage
     ) external isProductActive(products[_id].isAvailableNow) returns (bool) {
+
         // Assert that property is only edited by owner and not by any external contract
         require(
             products[_id].productOwner == msg.sender,
@@ -217,6 +224,7 @@ contract Rentforcement {
         products[_id].productName = _updatedName;
         products[_id].productDesc = _updatedDesc;
         products[_id].productPrice = _updatedPerDayPrice;
+        products[_id].productImage = _updatedProductImage;
         products[_id].lastDateAvailable = endDate;
         products[_id].isAvailable = newIsAvailable;
         return true;
@@ -224,12 +232,11 @@ contract Rentforcement {
 
     // Function to borrow product here
 
-    /**
-     * Function to fetch all products here
-     * Used in dashboard
-     * Checks whether product is active or not
-     */
+    // Function to fetch all products here
+    // Used in dashboard
+    // Checks whether product is active or not
     function fetchAllProducts() external view returns (Product[] memory) {
+
         // Declaring a new array in memory (nothing is stored in storage)
         // No gas used for external view function
         Product[] memory allProducts = new Product[](productId);
@@ -248,11 +255,9 @@ contract Rentforcement {
         return allProducts;
     }
 
-    /**
-     * Function to fetch owned products
-     * Used in dashboard
-     * Returns products which are owned by user calling the function
-     */
+    // Function to fetch owned products
+    // Used in dashboard
+    // Returns products which are owned by user calling the function
     function fetchMyProducts() external view returns (Product[] memory) {
         require(userProductCount[msg.sender] > 0, "you don't have any product");
 
@@ -279,11 +284,7 @@ contract Rentforcement {
     // function to check whether user exists or not
     function checkIfUserExists() external view returns (bool) {
         return users[msg.sender].isValid;
-        /*if (keccak256(abi.encodePacked(users[msg.sender].userName)) == keccak256(abi.encodePacked(""))) {
-            return false;
-        } else {
-            return true;
-        }*/
+        // if (keccak256(abi.encodePacked(users[msg.sender].userName)) == keccak256(abi.encodePacked("")))
     }
 
     // fetch all users
