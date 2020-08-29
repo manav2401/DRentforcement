@@ -1,5 +1,5 @@
 module.exports = {
-  address: "0xfDeEe33B1ECfB465E75e47E142a330e1eCeBeaAf",
+  address: "0x6E3956253F273D567e365947c97aeBB007278831",
   abi: [
     {
       "inputs": [
@@ -22,6 +22,11 @@ module.exports = {
           "internalType": "uint256",
           "name": "_perDayPrice",
           "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "_productImage",
+          "type": "string"
         }
       ],
       "name": "addProductOnRent",
@@ -118,6 +123,11 @@ module.exports = {
           "internalType": "uint256",
           "name": "_updatedPerDayPrice",
           "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "_updatedProductImage",
+          "type": "string"
         }
       ],
       "name": "editProductOnRent",
@@ -151,6 +161,11 @@ module.exports = {
               "internalType": "uint256",
               "name": "productPrice",
               "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "productImage",
+              "type": "string"
             },
             {
               "internalType": "address",
@@ -256,6 +271,11 @@ module.exports = {
               "internalType": "uint256",
               "name": "productPrice",
               "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "productImage",
+              "type": "string"
             },
             {
               "internalType": "address",
@@ -391,6 +411,11 @@ module.exports = {
           "internalType": "uint256",
           "name": "productPrice",
           "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "productImage",
+          "type": "string"
         },
         {
           "internalType": "address",

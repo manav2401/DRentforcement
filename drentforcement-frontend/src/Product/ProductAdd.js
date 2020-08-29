@@ -1,6 +1,5 @@
 import React, { Component, useState } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import {BrowserRouter as Router,  Redirect } from 'react-router-dom';
+import {Redirect } from 'react-router-dom';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Web3 from 'web3';
@@ -29,14 +28,11 @@ class ProductAdd extends Component {
             productName: "",
             productDesc: "",
             productPrice: "",
+            productImage: "",
             productNumberOfDays: "",
             isUserProfileComplete: false,
             isProductAdded: false,
-            baseImage: "",
-            setBaseImage: "",
         };
-
-        // const [baseImage, setBaseImage] = useState("");
 
         this.handleProductNameChange = this.handleProductNameChange.bind(this);
         this.handleProductDescChange = this.handleProductDescChange.bind(this);
@@ -50,9 +46,8 @@ class ProductAdd extends Component {
     async uploadImage(e) {
         const file = e.target.files[0];
         const base64 = await this.convertBase64(file);
-        // setBaseImage(base64);
         console.log('image uploaded: ' + base64);
-        this.setState({ setBaseImage: base64 });
+        this.setState({ productImage: base64 });
     };
     
     convertBase64 = (file) => {
@@ -192,7 +187,7 @@ class ProductAdd extends Component {
     async addNewProduct() {
 
         // contract call
-        // for porduct addition/updation here
+        // for product addition/updation here
 
         if (rentforcementContract) {
 
@@ -207,6 +202,7 @@ class ProductAdd extends Component {
                     this.state.productDesc,
                     numOfDays,
                     priceInWei,
+                    this.state.productImage
                 ).send();
 
                 console.log('Is product added: ' + productAdded);
@@ -258,18 +254,16 @@ class ProductAdd extends Component {
         console.log(this.state.productDesc)
         console.log(this.state.productPrice)
         console.log(this.state.productNumberOfDays)
+        console.log(this.state.productImage)
 
-        // contract call
-        // to update the details!
-
+        // update details here
         await this.addNewProduct();
 
     }
 
     render() {
 
-        const { isValid, isAuth, isMetamaskInstalled, isUserProfileComplete, isProductAdded, baseImage } = this.state;
-        const { setBaseImage } = this.state
+        const { isValid, isAuth, isMetamaskInstalled, isUserProfileComplete, isProductAdded, productImage } = this.state;
 
         var script;
         if (isProductAdded) {
@@ -297,9 +291,11 @@ class ProductAdd extends Component {
                                 <br></br><br></br>
                                 <TextField id="standard-basic" label="Number of days available" value={this.state.productNumberOfDays} onChange={this.handleProductNumberOfDaysChange} />
                                 <br></br><br></br>
-                                <input type = "file" onChange = {(e) => {this.uploadImage(e);}}/>
+                                <h3>Upload an image of product</h3>
+                                <input type="file" onChange={(e) => {this.uploadImage(e);}}/>
                                 <br></br><br></br>
-                                <img src={`${setBaseImage}`} />
+                                {/* <img src={`${productImage}`} /> */}
+                                <br></br>
                                 <Button variant="contained" color="primary" onClick={this.onProductAdd}>
                                     Save
                                 </Button>
@@ -315,9 +311,8 @@ class ProductAdd extends Component {
                     )
                 } else {
                     return (
-                        <Router>
-                            <Redirect to='/profile'/>
-                        </Router>                            
+                        // <Redirect to='/profile'/>
+                        <h2>Redirect</h2>
                     )
                 }
 
