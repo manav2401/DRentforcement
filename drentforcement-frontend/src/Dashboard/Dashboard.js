@@ -1,6 +1,9 @@
 // imports
 import React, { Component } from 'react';
 import Web3 from 'web3';
+import { Redirect } from 'react-router-dom';
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
 import detectEthereumProvider from '@metamask/detect-provider';
 
 // import { Redirect } from 'react-router-dom';
@@ -13,38 +16,46 @@ import './Dashboard.css';
 var sigUtil = require('eth-sig-util')
 var web3 = undefined;
 var userAccount = undefined;
+var rentforcementContract = undefined;
 
-/**
- * checks in dashboard
- * 1. check for provider
- * 2. set required flag if not found
- * 3. fetch account function
- * 4 .case1: if accounts fetched: use them 
- * 5. case2: if accounts not fetched: popup
- */
 class Dashboard extends React.Component {
 
-    state = {
-        isAuth: false,
-        isValid: false,
-        isMetamaskInstalled: false,
-    };
+    constructor(props) {
+        super(props);
+        this.state = {
+            isAuth: false,
+            isValid: false,
+            isMetamaskInstalled: false,
+            isUserProfileComplete: true,
+            dummyImage: "",
+        };
+
+        this.fetchAllProducts = this.fetchAllProducts.bind(this);
+    }
 
     async validateUser() {
-        var message = "Hello friend, Please sign this message! Your one time random nonce is " + Math.random();
+        const nonce = Math.round(Math.random() * 100 + Math.random() * 100);
+        var message = "Hello friend, Please sign this message! Your one time random nonce is " + nonce;
         var result = await web3.eth.personal.sign(
-          message,
-          userAccount,
-          function (err, result) {
-            if (err) return console.log('error: ' + err);
-          }
+            message,
+            userAccount,
+            function (err, result) {
+                if (err) {
+                    console.log('Unable to create personal sign message!');
+                    console.log('error: ' + err);
+                    return false;
+                }
+            }
         );
 
         const msgParams = { data: message }
         msgParams.sig = result
         const recovered = sigUtil.recoverPersonalSignature(msgParams)
 
-        if (recovered === userAccount) {
+        console.log('recovered: ' + recovered);
+        console.log('user account: ' + userAccount);
+
+        if (recovered.toLowerCase() === userAccount.toLowerCase()) {
             console.log('Verified!');
             return true;
         } else {
@@ -56,7 +67,7 @@ class Dashboard extends React.Component {
 
 
     async componentDidMount() {
-        
+
         const provider = await detectEthereumProvider();
 
         if (provider) {
@@ -66,7 +77,7 @@ class Dashboard extends React.Component {
                 this.setState({ isValid: false })
                 alert('Multiple wallets are installed!');
                 return;
-    
+
             } else {
 
                 console.log('Single wallet!');
@@ -80,10 +91,10 @@ class Dashboard extends React.Component {
                     userAccount = accounts[0];
                     console.log('Account fetched: ' + userAccount);
 
-                    var rentforcementContract = new web3.eth.Contract(
-                        abi, 
-                        address, 
-                        {gasPrice: '12345678', from: userAccount}
+                    rentforcementContract = new web3.eth.Contract(
+                        abi,
+                        address,
+                        { gasPrice: '20000000000', from: userAccount }
                     );
 
                     try {
@@ -91,9 +102,12 @@ class Dashboard extends React.Component {
                         console.log('Account fetched(yes/no): ' + result);
                         if (!result) {
                             try {
-                                const isUserValid = await this.validateUser();
-                                this.setState({ isAuth: isUserValid });
-                            } catch(error) {
+                                // const isUserValid = await this.validateUser();
+                                // this.setState({ isAuth: isUserValid });
+                                this.setState({ isAuth: false });
+                                this.setState({ isUserProfileComplete: false })
+
+                            } catch (error) {
                                 console.log('Error: ' + error);
                                 window.alert('Error in validating user!');
                             }
@@ -101,11 +115,61 @@ class Dashboard extends React.Component {
                             // user already validated
                             this.setState({ isAuth: true });
                         }
-                        
+
                     } catch (error) {
                         console.log('error: ' + error);
                         window.alert('Error in calling contract function!');
                         return;
+                    }
+
+                    // if auth is true
+                    if (this.state.isAuth) {
+
+                        // contract call for fetching profile!
+                        try {
+
+                            var fetchedUserProfile = await rentforcementContract.methods.fetchUserProfle().call();
+                            console.log('type: ' + typeof fetchedUserProfile);
+                            console.log(fetchedUserProfile);
+
+                            try {
+
+                                // check if profile is complete
+                                // if yes, proceed with addition
+                                // if no, redirect to profile
+
+                                var isProfileComplete = true;
+
+                                if (
+                                    fetchedUserProfile["userName"] == "" ||
+                                    fetchedUserProfile["userEmail"] == "" ||
+                                    fetchedUserProfile["userPhone"] == "" ||
+                                    fetchedUserProfile["userAddress"] == "" ||
+                                    fetchedUserProfile["userCity"] == "" ||
+                                    fetchedUserProfile["userState"] == ""
+                                ) {
+                                    isProfileComplete = false;
+                                }
+
+                                if (isProfileComplete) {
+                                    // continue with product add form!
+                                    this.setState({ isUserProfileComplete: true });
+                                } else {
+                                    // redirect to profile
+                                    this.setState({ isUserProfileComplete: false });
+                                }
+
+
+                            } catch (error) {
+                                // unable to fetch details!
+                                console.log('Unable to parse details! Error in fetching!');
+                            }
+
+
+                        } catch (error) {
+                            console.log('error: ' + error)
+                            console.log('Error in calling fetch profile function!');
+                        }
                     }
 
                 } catch (error) {
@@ -115,7 +179,7 @@ class Dashboard extends React.Component {
                 }
 
             }
-        
+
         }
         else {
             this.setState({ isMetamaskInstalled: false });
@@ -126,27 +190,51 @@ class Dashboard extends React.Component {
 
     }
 
+    async fetchAllProducts() {
+
+        if (rentforcementContract) {
+
+            try {
+
+                var products = await rentforcementContract.methods.fetchAllProducts().call();
+                console.log("Products fetched: " + products);
+                console.log(products[0]['productName']);
+                console.log(products[1]['productName']);
+                this.setState({ dummyImage: products[0]["productImage"] });
+
+            } catch (error) {
+
+                // error in fetching!
+                console.log('error: ' + error);
+                console.log('Error in calling product fetch function!');
+            }
+
+        } else {
+            // undefined!
+            console.log('Contract instance undefined!');
+        }
+
+    }
+
     render() {
         // this.componentDidMount();
-        const { isValid } = this.state;
-        const { isAuth } = this.state;
-        const { isMetamaskInstalled } = this.state;
+        const { isMetamaskInstalled, isValid, isAuth, isUserProfileComplete, dummyImage } = this.state;
 
         if (isMetamaskInstalled) {
             if (isValid) {
-                if (!isAuth) {
+
+                if (isUserProfileComplete) {
                     return (
-                        <div className="Dashboard">
-                            <h3>Redirect</h3>
-                        </div>
+                        <h2>Hello!</h2>
                     )
                 } else {
                     return (
-                        <div className="Dashboard">
-                            <h3>Welcome to D-rentforcement</h3>
+                        <div>
+                            <Redirect to='/profile' />
                         </div>
                     )
                 }
+
             } else {
                 return (
                     <div className="Dashboard">

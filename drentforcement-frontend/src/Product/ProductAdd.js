@@ -30,7 +30,7 @@ class ProductAdd extends Component {
             productPrice: "",
             productImage: "",
             productNumberOfDays: "",
-            isUserProfileComplete: false,
+            isUserProfileComplete: true,
             isProductAdded: false,
         };
 
@@ -311,8 +311,8 @@ class ProductAdd extends Component {
                     )
                 } else {
                     return (
-                        // <Redirect to='/profile'/>
-                        <h2>Redirect</h2>
+                        <Redirect to='/profile'/>
+                        // <h2>Redirect</h2>
                     )
                 }
 
