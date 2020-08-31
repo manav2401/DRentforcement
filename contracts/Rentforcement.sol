@@ -281,6 +281,29 @@ contract Rentforcement {
         return myProducts;
     }
 
+    // function to fetch complementary products (all others except users')
+    function fetchRemainingProducts() external view returns (Product[] memory) {
+
+        // declare an array for remaining products
+        // size = all products - user's products
+        uint256 ownProductsCount = userProductCount[msg.sender];
+        Product[] memory remainingProducts = new Product[](productId - ownProductsCount);
+
+        uint256 counter = 0;
+
+        // iterating over the product mapping
+        for (uint256 i = 0; i < productId; i++) {
+            // Only add those products which are not owned by user
+            if (products[i].productOwner != msg.sender) {
+                remainingProducts[counter] = products[i];
+                counter += 1;
+            }
+        }
+
+        return remainingProducts;
+
+    }
+
     // function to check whether user exists or not
     function checkIfUserExists() external view returns (bool) {
         return users[msg.sender].isValid;
