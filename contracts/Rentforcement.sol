@@ -7,7 +7,13 @@
 pragma solidity ^0.7.0;
 pragma experimental ABIEncoderV2;
 
+// importing the library
+import './BokkyPooBahsDateTimeLibrary.sol';
+
 contract Rentforcement {
+
+    // using the library for uint256/uint
+    using BokkyPooBahsDateTimeLibrary for uint256;
 
     // dummy variable
     uint256 dummy = 0;
@@ -26,19 +32,21 @@ contract Rentforcement {
 
     // Product structure
     struct Product {
+        uint256 productId;          // id of product
         string productName;         // name of product
         string productDesc;         // product description
         uint256 productPrice;       // price of product per day in wei (1 ether = 10^18 wei)
         string productImage;        // image of product
         address productOwner;       // Owner of the product
-        uint32 lastDateAvailable;   // storing the last date until which the product is available
+        uint256 productPeriod;       // number of days product is on rent
+        uint256 lastDateAvailable;   // storing the last date until which the product is available
         bool isAvailableNow;        // Is product available now i.e. is product active
         bool[] isAvailable;         // Array containing per day availability of product
     }
 
     // ID's for product and user
-    uint256 public productId;
-    uint256 public userId;
+    uint256 public productId;   // global id
+    uint256 public userId;      // global id
 
     // mapping of userid with useraddress
     mapping(uint256 => address) public userAddress;
@@ -138,21 +146,27 @@ contract Rentforcement {
     function addProductOnRent(
         string memory _productName,
         string memory _productDesc,
-        uint32 _numberOfDays,
+        uint256 _numberOfDays,
         uint256 _perDayPrice,
         string memory _productImage
     ) public returns (bool) {
 
+        // setting the startdate
+        (uint256 year, uint256 month, uint256 day) = BokkyPooBahsDateTimeLibrary.timestampToDate(block.timestamp);
+        uint256 startDate = BokkyPooBahsDateTimeLibrary.timestampFromDate(year, month, day);
+
         // calculating the enddate
-        uint32 endDate = uint32(block.timestamp + _numberOfDays);
+        uint256 endDate = uint256(startDate + _numberOfDays * 1 days);
 
         // creating a object of product in memory
         Product memory product = Product(
+            productId,
             _productName,
             _productDesc,
             _perDayPrice,
             _productImage,
             msg.sender,
+            _numberOfDays,
             endDate,
             true,
             new bool[](_numberOfDays)
@@ -194,7 +208,7 @@ contract Rentforcement {
         uint256 _id,
         string memory _updatedName,
         string memory _updatedDesc,
-        uint32 _updatedNumberOfDays,
+        uint256 _updatedNumberOfDays,
         uint256 _updatedPerDayPrice,
         string memory _updatedProductImage
     ) external isProductActive(products[_id].isAvailableNow) returns (bool) {
@@ -205,8 +219,12 @@ contract Rentforcement {
             "you don't have edit access"
         );
 
-        // Calculate the new enddate
-        uint32 endDate = uint32(block.timestamp + _updatedNumberOfDays);
+        // setting the startdate
+        (uint256 year, uint256 month, uint256 day) = BokkyPooBahsDateTimeLibrary.timestampToDate(block.timestamp);
+        uint256 startDate = BokkyPooBahsDateTimeLibrary.timestampFromDate(year, month, day);
+
+        // calculating the enddate
+        uint256 endDate = uint256(startDate + _updatedNumberOfDays * 1 days);
 
         // Assert that number of days are not reduced
         require(
@@ -225,12 +243,70 @@ contract Rentforcement {
         products[_id].productDesc = _updatedDesc;
         products[_id].productPrice = _updatedPerDayPrice;
         products[_id].productImage = _updatedProductImage;
+        products[_id].productPeriod = _updatedNumberOfDays;
         products[_id].lastDateAvailable = endDate;
         products[_id].isAvailable = newIsAvailable;
         return true;
     }
 
     // Function to borrow product here
+    // checks availability of product for given dates
+    function checkAvailability(uint256 _id, uint256 startDate, uint256 numberOfDays) public view returns(bool) {
+
+        // check whether current time is greater than last date available
+        require(
+            block.timestamp <= products[_id].lastDateAvailable,
+            'Sorry, product no longer on rent!'
+        );
+
+        // calculate the enddate
+        uint256 endDate = uint256(startDate + numberOfDays * 1 days);
+
+        // check whether enddate is greater than the last product available date
+        require(
+            endDate <= products[_id].lastDateAvailable,
+            'Sorry, the product is not available in the given time range!'
+        );
+
+        // finding the product start date
+        uint256 productStartDate = products[_id].lastDateAvailable - products[_id].productPeriod * 1 days;
+
+        // finding the start index
+        uint256 startIndex = BokkyPooBahsDateTimeLibrary.diffDays(productStartDate, startDate);
+
+        // checking the boolean array
+        for (uint256 i = startIndex; i < (startIndex + numberOfDays); i++) {
+            
+            // check if value is true or not
+            if (products[_id].isAvailable[i] == true) {
+                revert('Sorry, the product is not available for selected dates!');
+            }
+
+        }
+
+        // if reached here, product is available
+        return true;
+
+    }
+
+    // dummy function for checking
+    function getProductEndDate(uint256 _id) public view returns(uint256) {
+        return BokkyPooBahsDateTimeLibrary.getDay(products[_id].lastDateAvailable);
+    }
+
+    function getProductStartDate(uint256 _id) public view returns(uint) {
+        uint256 productStartDate = products[_id].lastDateAvailable - products[_id].productPeriod * 1 days;
+        return BokkyPooBahsDateTimeLibrary.getDay(productStartDate);
+    }
+
+    function getRentEndDate() public pure returns(uint256) {
+        uint256 startDate = 1599157800000;  // timestamp for sept4: 2020
+        uint256 numberOfDays = 4;
+        uint256 endDate = uint256(startDate + numberOfDays * 1 days);
+        return BokkyPooBahsDateTimeLibrary.getDay(endDate);
+    }
+
+    // function to book products
 
     // Function to fetch all products here
     // Used in dashboard
