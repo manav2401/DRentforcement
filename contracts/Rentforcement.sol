@@ -38,15 +38,26 @@ contract Rentforcement {
         uint256 productPrice;       // price of product per day in wei (1 ether = 10^18 wei)
         string productImage;        // image of product
         address productOwner;       // Owner of the product
-        uint256 productPeriod;       // number of days product is on rent
-        uint256 lastDateAvailable;   // storing the last date until which the product is available
+        uint256 productPeriod;      // number of days product is on rent
+        uint256 lastDateAvailable;  // storing the last date until which the product is available
         bool isAvailableNow;        // Is product available now i.e. is product active
-        bool[] isNotAvailable;         // Array containing per day availability of product
+        bool[] isNotAvailable;      // Array containing per day availability of product
+    }
+
+    // order structure
+    struct Order {
+        uint256 productId;
+        uint256 startDate;
+        uint256 endDate;
+        uint256 valuePaid;
+        uint256 valueInDeposit;
+        address user;
     }
 
     // ID's for product and user
     uint256 public productId;   // global id
     uint256 public userId;      // global id
+    uint256 public orderId;     // global id
 
     // mapping of userid with useraddress
     mapping(uint256 => address) public userAddress;
@@ -59,6 +70,9 @@ contract Rentforcement {
 
     // mapping of user address with product count
     mapping(address => uint32) public userProductCount;
+
+    // mapping of order id to order object
+    mapping(uint256 => Order) public orders;
 
     // Add emit events here
 
@@ -270,12 +284,8 @@ contract Rentforcement {
             'Sorry, the product is not available in the given time range!'
         );
 
-        // finding the product start date
-        // a simple hack!
-        uint256 productStartDate = products[_id].lastDateAvailable + 1 - products[_id].productPeriod * 1 days;
-
-        // finding the start index
-        uint256 startIndex = BokkyPooBahsDateTimeLibrary.diffDays(productStartDate, startDate);
+        // get start index for array!
+        uint256 startIndex = getRentIndex(_id, startDate, numberOfDays);
 
         // checking the boolean array
         for (uint256 i = startIndex; i < (startIndex + numberOfDays); i++) {
@@ -292,14 +302,72 @@ contract Rentforcement {
 
     }
 
-    function getRentIndex(uint256 _id) public view returns(uint256) {
+    function getRentIndex(uint256 _id, uint256 startDate, uint256 numberOfDays) internal view returns(uint256) {
         uint256 productStartDate = products[_id].lastDateAvailable + 1 - products[_id].productPeriod * 1 days;
-        uint256 startDate = BokkyPooBahsDateTimeLibrary.timestampFromDate(2020, 9, 8);  // timestamp for sept5: 2020
         uint256 startIndex = BokkyPooBahsDateTimeLibrary.diffDays(productStartDate, startDate);
         return startIndex;
     }
 
-    // function to book products
+    function makePayment(address beneficiary, uint256 value) internal {
+        // make payment
+        address(uint160(beneficiary)).transfer(value);
+    }
+
+    function placeOrder(uint256 _productId, uint256 startDate, uint256 numberOfDays) public payable {
+
+        uint256 price = products[_productId].productPrice * numberOfDays;
+
+        // add deposit amt here!
+        uint256 depositAmount = 0;
+
+        require(
+            msg.value == price,
+            'Sent insufficient funds'
+        );
+
+        // transfer funds
+        makePayment(msg.sender, price);
+
+        // all conditions fulfilled and funds transferred!
+        // create new order
+
+        createOrder(_productId, msg.sender, price, depositAmount, startDate, numberOfDays);
+
+    }
+
+    function createOrder(uint256 _productId, address user, uint256 price, uint256 deposit, uint256 startDate, uint256 numberOfDays) internal {
+
+        // get the product instance
+        Product storage product = products[_productId];
+
+        // change the boolean array for the booking!
+        uint256 startIndex = getRentIndex(_productId, startDate, numberOfDays);
+        for (uint256 i = startIndex; i < (startIndex + numberOfDays); i++) {
+            product.isNotAvailable[i] = true;
+        }
+
+        // calculate the timestamp for endDate (for Order instance)
+        uint256 endDate = startDate + (numberOfDays * 1 days)- 1;
+
+        // creating the order object
+        Order memory currentOrder = Order(
+            _productId,
+            startDate,
+            endDate,
+            price,
+            deposit,
+            user
+        );
+
+        // storing to permanant storage
+        orders[orderId] = currentOrder;
+
+        // emit event here
+
+        // increment the count
+        orderId += 1;
+
+    }
 
     // Function to fetch all products here
     // Used in dashboard
