@@ -1,5 +1,5 @@
 module.exports = {
-  address: "0xA57d65E49D6ef78FcDAD73140c76Aafb8D1D7404",
+  address: "0xfFBd3eDBB89Ae9705A22C2984848088922D55D79",
   abi: [
     {
       "inputs": [
@@ -14,9 +14,9 @@ module.exports = {
           "type": "string"
         },
         {
-          "internalType": "uint32",
+          "internalType": "uint256",
           "name": "_numberOfDays",
-          "type": "uint32"
+          "type": "uint256"
         },
         {
           "internalType": "uint256",
@@ -38,6 +38,35 @@ module.exports = {
         }
       ],
       "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_id",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "startDate",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "numberOfDays",
+          "type": "uint256"
+        }
+      ],
+      "name": "checkAvailability",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -98,55 +127,16 @@ module.exports = {
       "type": "function"
     },
     {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_id",
-          "type": "uint256"
-        },
-        {
-          "internalType": "string",
-          "name": "_updatedName",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "_updatedDesc",
-          "type": "string"
-        },
-        {
-          "internalType": "uint32",
-          "name": "_updatedNumberOfDays",
-          "type": "uint32"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_updatedPerDayPrice",
-          "type": "uint256"
-        },
-        {
-          "internalType": "string",
-          "name": "_updatedProductImage",
-          "type": "string"
-        }
-      ],
-      "name": "editProductOnRent",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
       "inputs": [],
       "name": "fetchAllProducts",
       "outputs": [
         {
           "components": [
+            {
+              "internalType": "uint256",
+              "name": "productId",
+              "type": "uint256"
+            },
             {
               "internalType": "string",
               "name": "productName",
@@ -173,9 +163,14 @@ module.exports = {
               "type": "address"
             },
             {
-              "internalType": "uint32",
+              "internalType": "uint256",
+              "name": "productPeriod",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
               "name": "lastDateAvailable",
-              "type": "uint32"
+              "type": "uint256"
             },
             {
               "internalType": "bool",
@@ -184,7 +179,7 @@ module.exports = {
             },
             {
               "internalType": "bool[]",
-              "name": "isAvailable",
+              "name": "isNotAvailable",
               "type": "bool[]"
             }
           ],
@@ -258,6 +253,11 @@ module.exports = {
         {
           "components": [
             {
+              "internalType": "uint256",
+              "name": "productId",
+              "type": "uint256"
+            },
+            {
               "internalType": "string",
               "name": "productName",
               "type": "string"
@@ -283,9 +283,14 @@ module.exports = {
               "type": "address"
             },
             {
-              "internalType": "uint32",
+              "internalType": "uint256",
+              "name": "productPeriod",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
               "name": "lastDateAvailable",
-              "type": "uint32"
+              "type": "uint256"
             },
             {
               "internalType": "bool",
@@ -294,7 +299,72 @@ module.exports = {
             },
             {
               "internalType": "bool[]",
-              "name": "isAvailable",
+              "name": "isNotAvailable",
+              "type": "bool[]"
+            }
+          ],
+          "internalType": "struct Rentforcement.Product[]",
+          "name": "",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "fetchRemainingProducts",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "productId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "productName",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "productDesc",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "productPrice",
+              "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "productImage",
+              "type": "string"
+            },
+            {
+              "internalType": "address",
+              "name": "productOwner",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "productPeriod",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "lastDateAvailable",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bool",
+              "name": "isAvailableNow",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool[]",
+              "name": "isNotAvailable",
               "type": "bool[]"
             }
           ],
@@ -375,6 +445,110 @@ module.exports = {
       "type": "function"
     },
     {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_id",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "startDate",
+          "type": "uint256"
+        }
+      ],
+      "name": "getRentIndex",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "orderId",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "orders",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "productId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "startDate",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "endDate",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "valuePaid",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "valueInDeposit",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_productId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "startDate",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "numberOfDays",
+          "type": "uint256"
+        }
+      ],
+      "name": "placeOrder",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
       "inputs": [],
       "name": "productId",
       "outputs": [
@@ -397,6 +571,11 @@ module.exports = {
       ],
       "name": "products",
       "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "productId",
+          "type": "uint256"
+        },
         {
           "internalType": "string",
           "name": "productName",
@@ -423,9 +602,14 @@ module.exports = {
           "type": "address"
         },
         {
-          "internalType": "uint32",
+          "internalType": "uint256",
+          "name": "productPeriod",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
           "name": "lastDateAvailable",
-          "type": "uint32"
+          "type": "uint256"
         },
         {
           "internalType": "bool",

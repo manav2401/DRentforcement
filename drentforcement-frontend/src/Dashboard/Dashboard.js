@@ -3,8 +3,22 @@ import React, { Component } from 'react';
 import Web3 from 'web3';
 import { Redirect } from 'react-router-dom';
 import TextField from '@material-ui/core/TextField';
-import Button from '@material-ui/core/Button';
 import detectEthereumProvider from '@metamask/detect-provider';
+
+import AppBar from '@material-ui/core/AppBar';
+import Button from '@material-ui/core/Button';
+import Card from '@material-ui/core/Card';
+import CardActions from '@material-ui/core/CardActions';
+import CardContent from '@material-ui/core/CardContent';
+import CardMedia from '@material-ui/core/CardMedia';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import Grid from '@material-ui/core/Grid';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import { makeStyles } from '@material-ui/core/styles';
+import Container from '@material-ui/core/Container';
+import Link from '@material-ui/core/Link';
+
 
 // import { Redirect } from 'react-router-dom';
 
@@ -27,7 +41,7 @@ class Dashboard extends React.Component {
             isValid: false,
             isMetamaskInstalled: false,
             isUserProfileComplete: true,
-            dummyImage: "",
+            products: []
         };
 
         this.fetchAllProducts = this.fetchAllProducts.bind(this);
@@ -152,8 +166,12 @@ class Dashboard extends React.Component {
                                 }
 
                                 if (isProfileComplete) {
-                                    // continue with product add form!
+                                    // continue with dashboard
                                     this.setState({ isUserProfileComplete: true });
+
+                                    // fetch products
+                                    await this.fetchAllProducts();
+
                                 } else {
                                     // redirect to profile
                                     this.setState({ isUserProfileComplete: false });
@@ -196,11 +214,9 @@ class Dashboard extends React.Component {
 
             try {
 
-                var products = await rentforcementContract.methods.fetchAllProducts().call();
-                console.log("Products fetched: " + products);
-                console.log(products[0]['productName']);
-                console.log(products[1]['productName']);
-                this.setState({ dummyImage: products[0]["productImage"] });
+                var fetchedProducts = await rentforcementContract.methods.fetchRemainingProducts().call();
+                console.log("Products fetched: " + fetchedProducts);
+                this.setState({ products: fetchedProducts })
 
             } catch (error) {
 
@@ -217,16 +233,19 @@ class Dashboard extends React.Component {
     }
 
     render() {
+
         // this.componentDidMount();
-        const { isMetamaskInstalled, isValid, isAuth, isUserProfileComplete, dummyImage } = this.state;
+        const { isMetamaskInstalled, isValid, isAuth, isUserProfileComplete, products } = this.state;
 
         if (isMetamaskInstalled) {
             if (isValid) {
 
                 if (isUserProfileComplete) {
-                    return (
-                        <h2>Hello!</h2>
-                    )
+                        return (
+                            <p>
+                                Hello world!
+                            </p>
+                        )
                 } else {
                     return (
                         <div>

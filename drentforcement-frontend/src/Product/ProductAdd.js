@@ -287,7 +287,7 @@ class ProductAdd extends Component {
                                 <br></br><br></br>
                                 <TextField id="standard-basic" label="Product Description" multiline rowsMax={4} value={this.state.productDesc} onChange={this.handleProductDescChange} />
                                 <br></br><br></br>
-                                <TextField id="standard-basic" label="Per Day Price of Product in Ethers" value={this.state.productPrice} onChange={this.handleProductPriceChange} />
+                                <TextField id="standard-basic" label="Per Day Price (in ETH)" value={this.state.productPrice} onChange={this.handleProductPriceChange} />
                                 <br></br><br></br>
                                 <TextField id="standard-basic" label="Number of days available" value={this.state.productNumberOfDays} onChange={this.handleProductNumberOfDaysChange} />
                                 <br></br><br></br>
@@ -299,10 +299,6 @@ class ProductAdd extends Component {
                                 <Button variant="contained" color="primary" onClick={this.onProductAdd}>
                                     Save
                                 </Button>
-                            </div>
-
-                            <div className="add-note">
-                                <h3>Kindly note that your product will be available on rent, from this time onwards!</h3>
                             </div>
 
                             {script}

@@ -344,7 +344,6 @@ class Profile extends React.Component {
                                 <Button variant="contained" color="primary" onClick={this.onProfileSave}>
                                     Save
                                 </Button>
-                                <button type="button" class="btn btn-success">Success</button>
                                 {isUpdatedMessage}
                             </div>
                             {/* <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script> */}
