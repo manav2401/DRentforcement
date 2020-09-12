@@ -23,7 +23,7 @@ class App extends Component {
             <Route exact path="/auth" component={Auth} />
             <Route exact path="/profile" component={Profile} />
             <Route exact path="/add" component={ProductAdd} />
-            <Route exact path="/test" component={Test} />
+            {/* <Route exact path="/test" component={Test} /> */}
             <Route exact path="/error" component={Error} />
             <Redirect to="/error" />
           </Switch>

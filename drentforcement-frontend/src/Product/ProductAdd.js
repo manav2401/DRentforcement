@@ -1,7 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import {Redirect } from 'react-router-dom';
-import TextField from '@material-ui/core/TextField';
+import {Redirect, Link as RouterLink } from 'react-router-dom';
+
+import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
+import TextField from '@material-ui/core/TextField';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import Paper from '@material-ui/core/Paper';
+import Link from '@material-ui/core/Link';
+import Container from '@material-ui/core/Container';
+
 import Web3 from 'web3';
 import { ContractAddress, abi } from '../contractArtifacts';
 import detectEthereumProvider from '@metamask/detect-provider';
@@ -14,8 +27,63 @@ var userAccount = undefined;
 var rentforcementContract = undefined;
 var uploadImage = undefined;
 var convertBase64 = undefined;
+var flag = false;
+
+const useStyles = makeStyles((theme) => ({
+    appBar: {
+        position: 'relative',
+    },
+    layout: {
+        width: 'auto',
+        marginLeft: theme.spacing(2),
+        marginRight: theme.spacing(2),
+        [theme.breakpoints.up(600 + theme.spacing(2) * 2)]: {
+            width: 600,
+            marginLeft: 'auto',
+            marginRight: 'auto',
+        },
+    },
+    paper: {
+        marginTop: theme.spacing(3),
+        marginBottom: theme.spacing(3),
+        padding: theme.spacing(2),
+        [theme.breakpoints.up(600 + theme.spacing(3) * 2)]: {
+            marginTop: theme.spacing(6),
+            marginBottom: theme.spacing(6),
+            padding: theme.spacing(3),
+        },
+    },
+    stepper: {
+        padding: theme.spacing(3, 0, 5),
+    },
+    buttons: {
+        display: 'flex',
+        justifyContent: 'flex-end',
+    },
+    button: {
+        marginTop: theme.spacing(3),
+        marginLeft: theme.spacing(1),
+    },
+    submit: {
+        margin: theme.spacing(3, 0, 2),
+    },
+    bottom: {
+        display: 'flex',
+        marginTop: theme.spacing(3),
+        marginLeft: theme.spacing(1),
+    },
+    heroContent: {
+        backgroundColor: theme.palette.background.paper,
+        padding: theme.spacing(3, 0, 3),
+    },
+    heroButtons: {
+        marginTop: theme.spacing(4),
+    },
+}));
 
 function ProductAdd(props) {
+
+    const classes = useStyles();
 
     const [isAuth, setIsAuth] = useState(true);
     const [isValid, setIsValid] = useState(false);
@@ -31,7 +99,7 @@ function ProductAdd(props) {
 
     const uploadImage = async (e) => {
         const file = e.target.files[0];
-        const base64 = await this.convertBase64(file);
+        const base64 = await convertBase64(file);
         console.log('image uploaded: ' + base64);
         // this.setState({ productImage: base64 });
         setProductImage(base64);
@@ -90,6 +158,7 @@ function ProductAdd(props) {
                         try {
                             var result = await rentforcementContract.methods.checkIfUserExists().call();
                             console.log('Account fetched(yes/no): ' + result);
+                            flag = true;
                             if (!result) {
                                 // redirect user to profile page
                                 // for validation
@@ -181,7 +250,7 @@ function ProductAdd(props) {
 
         preChecks();
 
-    }, []);
+    }, [flag]);
 
     const addNewProduct = async () => {
 
@@ -222,7 +291,8 @@ function ProductAdd(props) {
                 // error in saving!
                 console.log('error: ' + error);
                 console.log('Error in calling product add function!');
-                this.setState({ isProfileUpdated: true });
+                setIsProductAdded(false);
+                // this.setState({ isProfileUpdated: false });
             }
 
         } else {
@@ -266,34 +336,161 @@ function ProductAdd(props) {
 
     }
 
+    const ProductForm = (
+        <React.Fragment>
+        <Grid container spacing={3}>
+            <Grid item xs={12}>
+            <TextField
+                required
+                id="name"
+                name="name"
+                label="Product Name"
+                fullWidth
+                autoComplete="product-name"
+                value={productName}
+                onChange={handleProductNameChange}
+            />
+            </Grid>
+            <Grid item xs={12}>
+            <TextField
+                required
+                id="desc"
+                name="desc"
+                label="Product Description"
+                fullWidth
+                autoComplete="product-description"
+                value={productDesc}
+                onChange={handleProductDescChange}
+            />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+            <TextField
+                required
+                id="price"
+                name="price"
+                label="Per Day Price (in ETH)"
+                fullWidth
+                autoComplete="price-in-eth"
+                value={productPrice}
+                onChange={handleProductPriceChange}
+            />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+            <TextField
+                required
+                id="number-of-days"
+                name="number-of-days"
+                label="Number of Days Available"
+                fullWidth
+                autoComplete="number-of-days"
+                value={productNumberOfDays}
+                onChange={handleProductNumberOfDaysChange}
+            />
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
+                <div style={{'paddingTop': '1cm'}}>
+                    Choose an image of product
+                </div>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+                <div style={{'paddingTop': '1cm'}}>
+                <input
+                        type="file"
+                        onChange={(e) => {uploadImage(e);}}
+                        // style={{'paddingTop': '1cm'}}
+                    />
+
+                </div>
+            </Grid>
+
+            <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+                className={classes.submit}
+                onClick={onProductAdd}
+            >
+                Save
+            </Button>
+        </Grid>
+        </React.Fragment>
+    )
+
     if (isMetamaskInstalled) {
         if (isValid) {
             if (isAuth && isUserProfileComplete) {
                     return (
-                        <div className="product-add">
-                            <h2>Rent @ Rentforcement</h2>
-                            <h3>Just fill in some basic info and you're good to go!</h3>
 
-                            <div className="product-add-form" autoComplete="off">
-                                <TextField id="standard-basic" label="Product Name" value={productName} onChange={handleProductNameChange} />
-                                <br></br><br></br>
-                                <TextField id="standard-basic" label="Product Description" multiline rowsMax={4} value={productDesc} onChange={handleProductDescChange} />
-                                <br></br><br></br>
-                                <TextField id="standard-basic" label="Per Day Price (in ETH)" value={productPrice} onChange={handleProductPriceChange} />
-                                <br></br><br></br>
-                                <TextField id="standard-basic" label="Number of days available" value={productNumberOfDays} onChange={handleProductNumberOfDaysChange} />
-                                <br></br><br></br>
-                                <h3>Upload an image of product</h3>
-                                <input type="file" onChange={(e) => {uploadImage(e);}}/>
-                                <br></br><br></br>
-                                {/* <img src={`${productImage}`} /> */}
-                                <br></br>
-                                <Button variant="contained" color="primary" onClick={onProductAdd}>
-                                    Save
-                                </Button>
+                        <React.Fragment>
+                        <CssBaseline />
+                        <AppBar position="absolute" color="default" className={classes.appBar}>
+                            <Toolbar>
+                            <Typography variant="h6" color="inherit" noWrap>
+                                DRentforcement
+                            </Typography>
+                            </Toolbar>
+                        </AppBar>
+
+                        <React.Fragment>
+                        <main className={classes.layout}>
+                            <Paper className={classes.paper}>
+                                <Typography component="h1" variant="h4" align="center">
+                                    Rent @ rentforcementContract
+                                </Typography>
+
+                                <Typography component="h1" variant="h6" align="center">
+                                    (Note: Product will be on rent from this instant)
+                                </Typography>
+
+                                <React.Fragment>
+                                    <div style={{'paddingTop': '1cm'}}>
+                                        {ProductForm}
+                                    </div>
+                                </React.Fragment>                            
+                            </Paper>
+                        </main>
+                        </React.Fragment>
+
+                        <React.Fragment>
+                            <Container maxWidth="sm">
+                            <div className={classes.heroContent}>
+                                <div className={classes.heroButtons}>
+                                <Grid container spacing={2} justify="center">
+                                    <Grid item>
+                                        <RouterLink to='/'>
+                                        <Button 
+                                            variant="outlined"
+                                            color="primary"
+                                            component={RouterLink}
+                                            to={'/'}
+                                        >
+                                            Go to Dashboard
+                                        </Button>
+                                        </RouterLink>
+                                    </Grid>
+                                    <Grid item>
+                                        <RouterLink to='/add'>
+                                        <Button 
+                                            variant="outlined"
+                                            color="primary"
+                                            component={RouterLink}
+                                            to={'/'}
+                                        >
+                                            View your products
+                                        </Button>
+                                        </RouterLink>
+                                    </Grid>
+                                </Grid>
+                                </div>
                             </div>
+                            </Container>
+                        </React.Fragment>
 
-                        </div>
+                    </React.Fragment>
+
+
                     )
 
             } else {

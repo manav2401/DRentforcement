@@ -30,6 +30,7 @@ var sigUtil = require('eth-sig-util')
 var web3 = undefined;
 var userAccount = undefined;
 var rentforcementContract = undefined;
+var flag = false;
 
 const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
@@ -38,6 +39,23 @@ const cards2 = [
     {"index": 2, "link": "https://source.unsplash.com/xsGxhtAsfSA/1600x900"},
     {"index": 3, "link": "https://source.unsplash.com/8sjBzL1IyMo/1600x900"},
     {"index": 4, "link": "https://source.unsplash.com/8tQPCBjx_6M/1600x900"},
+]
+
+const testProducts = [
+    {
+        'prodictId': 0,
+        'productName': 'Football',
+        'productDesc': 'Football',
+        'productPrice': 0.0001,
+        'productImage': 'https://source.unsplash.com/dKCKiC0BQtU/1600x900'
+    },
+    {
+        'prodictId': 1,
+        'productName': 'Bagpack',
+        'productDesc': 'Bagpack',
+        'productPrice': 0.0001,
+        'productImage': 'https://source.unsplash.com/8sjBzL1IyMo/1600x900'
+    }
 ]
 
 const useStyles = makeStyles((theme) => ({
@@ -154,6 +172,7 @@ function Dashboard(props) {
                         try {
                             var result = await rentforcementContract.methods.checkIfUserExists().call();
                             console.log('Account fetched(yes/no): ' + result);
+                            flag = true;
                             if (!result) {
                                 try {
                                     // const isUserValid = await this.validateUser();
@@ -256,7 +275,7 @@ function Dashboard(props) {
         
         preChecks();
 
-    }, []);
+    }, [flag]);
 
     const fetchAllProducts = async () => {
         if (rentforcementContract) {
@@ -319,17 +338,6 @@ function Dashboard(props) {
         </Container>
     )
 
-    const Footer = (
-        <Typography variant="body2" color="textSecondary" align="center">
-            {'Copyright © '}
-            <Link color="inherit" href="https://material-ui.com/">
-                Your Website
-            </Link>{' '}
-            {new Date().getFullYear()}
-            {'.'}
-        </Typography>
-    )
-
     if (isMetamaskInstalled) {
         if (isValid) {
             if (isAuth && isUserProfileComplete) {
@@ -343,20 +351,20 @@ function Dashboard(props) {
                         </div>
                         <Container className={classes.cardGrid} maxWidth="md">
                         <Grid container spacing={4}>
-                        {cards2.map((card) => (
-                            <Grid item key={card.index} xs={12} sm={6} md={4}>
+                        {products.map((product) => (
+                            <Grid item key={product.prodictId} xs={12} sm={6} md={4}>
                                 <Card className={classes.card}>
                                     <CardMedia
                                         className={classes.cardMedia}
-                                        image={card.link}
+                                        image="https://source.unsplash.com/dKCKiC0BQtU/1600x900"
                                         title="Image title"
                                     />
                                     <CardContent className={classes.cardContent}>
                                         <Typography gutterBottom variant="h5" component="h2">
-                                            Product
+                                            {product.productName}
                                         </Typography>
                                         <Typography>
-                                            Product Description
+                                            {product.productDesc}
                                         </Typography>
                                     </CardContent>
                                     
@@ -371,9 +379,6 @@ function Dashboard(props) {
                         </Grid>
                         </Container>
                     </main>
-                    <footer className={classes.footer}>
-                        {Footer}
-                    </footer>
                     </React.Fragment>
                 )
 

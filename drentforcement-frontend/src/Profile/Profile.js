@@ -1,7 +1,20 @@
 import React, { useState, useEffect } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
+
 import { makeStyles } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
+import TextField from '@material-ui/core/TextField';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import Paper from '@material-ui/core/Paper';
+import Link from '@material-ui/core/Link';
+import Container from '@material-ui/core/Container';
+
 import Web3 from 'web3';
 import { ContractAddress, abi } from '../contractArtifacts';
 import detectEthereumProvider from '@metamask/detect-provider';
@@ -12,8 +25,63 @@ var ethUtil = require('ethereumjs-util');
 var web3 = undefined;
 var userAccount = undefined;
 var rentforcementContract = undefined;
+var flag = false;
+
+const useStyles = makeStyles((theme) => ({
+    appBar: {
+        position: 'relative',
+    },
+    layout: {
+        width: 'auto',
+        marginLeft: theme.spacing(2),
+        marginRight: theme.spacing(2),
+        [theme.breakpoints.up(600 + theme.spacing(2) * 2)]: {
+            width: 600,
+            marginLeft: 'auto',
+            marginRight: 'auto',
+        },
+    },
+    paper: {
+        marginTop: theme.spacing(3),
+        marginBottom: theme.spacing(3),
+        padding: theme.spacing(2),
+        [theme.breakpoints.up(600 + theme.spacing(3) * 2)]: {
+            marginTop: theme.spacing(6),
+            marginBottom: theme.spacing(6),
+            padding: theme.spacing(3),
+        },
+    },
+    stepper: {
+        padding: theme.spacing(3, 0, 5),
+    },
+    buttons: {
+        display: 'flex',
+        justifyContent: 'flex-end',
+    },
+    button: {
+        marginTop: theme.spacing(3),
+        marginLeft: theme.spacing(1),
+    },
+    submit: {
+        margin: theme.spacing(3, 0, 2),
+    },
+    bottom: {
+        display: 'flex',
+        marginTop: theme.spacing(3),
+        marginLeft: theme.spacing(1),
+    },
+    heroContent: {
+        backgroundColor: theme.palette.background.paper,
+        padding: theme.spacing(3, 0, 3),
+    },
+    heroButtons: {
+        marginTop: theme.spacing(4),
+    },
+}));
 
 function Profile(props) {
+
+    const classes = useStyles();
 
     const [isAuth, setIsAuth] = useState(false);
     const [isValid, setIsValid] = useState(false);
@@ -96,6 +164,7 @@ function Profile(props) {
                         try {
                             var result = await rentforcementContract.methods.checkIfUserExists().call();
                             console.log('Account fetched(yes/no): ' + result);
+                            flag = true;
                             if (!result) {
                                 try {
                                     const isUserValid = await validateUser();
@@ -151,6 +220,9 @@ function Profile(props) {
                                         isProfileComplete = false;
                                     }
                                     
+                                    console.log('Profile Completed: ' + isProfileComplete);
+                                    console.log('Fetched profile')
+                                    console.log(fetchedUserProfile);
                                     setUsername(fetchedUserProfile['userName']);
                                     setEmailaddress(fetchedUserProfile['userEmail']);
                                     setContact(fetchedUserProfile['userPhone']);
@@ -220,7 +292,7 @@ function Profile(props) {
 
         preChecks();
 
-    }, []);
+    }, [flag]);
 
     const saveProfileDetails = async () => {
 
@@ -308,6 +380,101 @@ function Profile(props) {
 
     }
 
+    const goToDashboard = async () => {
+        console.log('go to dashboard');
+
+    }
+
+    const ProfileForm = (
+        <React.Fragment>
+        <Grid container spacing={3}>
+            <Grid item xs={12}>
+            <TextField
+                required
+                id="name"
+                name="name"
+                label="Full Name"
+                fullWidth
+                autoComplete="full-name"
+                value={username}
+                onChange={handleUsernameChange}
+            />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+            <TextField
+                required
+                id="email"
+                name="email"
+                label="Email Address"
+                fullWidth
+                autoComplete="email-address"
+                value={emailaddress}
+                onChange={handleEmailChange}
+            />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+            <TextField
+                required
+                id="contact"
+                name="contact"
+                label="Contact Number"
+                fullWidth
+                autoComplete="contact-number"
+                value={contact}
+                onChange={handleContactChange}
+            />
+            </Grid>
+            <Grid item xs={12}>
+            <TextField
+                required
+                id="address"
+                name="address"
+                label="Address line"
+                fullWidth
+                autoComplete="address-line"
+                value={address}
+                onChange={handleAddressChange}
+            />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+            <TextField
+                required
+                id="city"
+                name="city"
+                label="City"
+                fullWidth
+                autoComplete="city"
+                value={city}
+                onChange={handleCityChange}
+            />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+            <TextField
+                required
+                id="state"
+                name="state"
+                label="State/Province/Region"
+                fullWidth
+                autoComplete="state"
+                value={state}
+                onChange={handleStateChange}
+            />
+            </Grid>
+            <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+                className={classes.submit}
+                onClick={onProfileSave}
+            >
+                Save
+            </Button>
+        </Grid>
+        </React.Fragment>
+    )
+
+
     const isUpdatedMessage = () => {
         if (isProfileUpdated) {
             return (
@@ -329,28 +496,69 @@ function Profile(props) {
                     </div>
                 )
             } else {
-                return (
-                    <div className="profile-main">
-                        <h2>Profile!</h2>
-                        <div className="profile-form" autoComplete="off">
-                            <TextField id="standard-basic" label="Name" value={username} onChange={handleUsernameChange} />
-                            <br></br><br></br>
-                            <TextField id="standard-basic" label="Email Address" value={emailaddress} onChange={handleEmailChange} />
-                            <br></br><br></br>
-                            <TextField id="standard-basic" label="Contact Number" value={state.contact} onChange={handleContactChange} />
-                            <br></br><br></br>
-                            <TextField id="standard-basic" label="Address" value={state.address} onChange={handleAddressChange} />
-                            <br></br><br></br>
-                            <TextField id="standard-basic" label="City" value={state.city} onChange={handleCityChange} />
-                            <br></br><br></br>
-                            <TextField id="standard-basic" label="State" value={state.state} onChange={handleStateChange} />
-                            <br></br><br></br>
-                            <Button variant="contained" color="primary" onClick={onProfileSave}>
-                                Save
-                            </Button>
-                            {isUpdatedMessage}
-                        </div>
-                    </div>
+                return(
+                    
+                    <React.Fragment>
+                        <CssBaseline />
+                        <AppBar position="absolute" color="default" className={classes.appBar}>
+                            <Toolbar>
+                            <Typography variant="h6" color="inherit" noWrap>
+                                DRentforcement
+                            </Typography>
+                            </Toolbar>
+                        </AppBar>
+
+                        <React.Fragment>
+                        <main className={classes.layout}>
+                            <Paper className={classes.paper}>
+                                <Typography component="h1" variant="h4" align="center">
+                                    Profile
+                                </Typography>
+
+                                <React.Fragment>
+                                    {ProfileForm}
+                                </React.Fragment>                            
+                            </Paper>
+                        </main>
+                        </React.Fragment>
+
+                        <React.Fragment>
+                            <Container maxWidth="sm">
+                            <div className={classes.heroContent}>
+                                <div className={classes.heroButtons}>
+                                <Grid container spacing={2} justify="center">
+                                    <Grid item>
+                                        <RouterLink to='/'>
+                                        <Button 
+                                            variant="outlined"
+                                            color="primary"
+                                            component={RouterLink}
+                                            to={'/'}
+                                        >
+                                            Go to Dashboard
+                                        </Button>
+                                        </RouterLink>
+                                    </Grid>
+                                    <Grid item>
+                                        <RouterLink to='/add'>
+                                        <Button 
+                                            variant="outlined"
+                                            color="primary"
+                                            component={RouterLink}
+                                            to={'/add'}
+                                        >
+                                            Get started! Add a new product
+                                        </Button>
+                                        </RouterLink>
+                                    </Grid>
+                                </Grid>
+                                </div>
+                            </div>
+                            </Container>
+                        </React.Fragment>
+
+                    </React.Fragment>
+
                 )
             }
         } else {
