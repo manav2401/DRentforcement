@@ -1,5 +1,5 @@
 module.exports = {
-  ContractAddress: "0x29E9BEf3022Ac3C9876016BBDC1D11899df10845",
+  ContractAddress: "0xC990e0604b4a61449b52934702270f252111edBA",
   abi: [
 	{
 		"inputs": [
@@ -434,19 +434,6 @@ module.exports = {
 	{
 		"inputs": [],
 		"name": "getDummy",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "getProductStartDate",
 		"outputs": [
 			{
 				"internalType": "uint256",

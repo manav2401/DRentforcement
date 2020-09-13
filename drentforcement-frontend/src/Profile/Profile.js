@@ -25,7 +25,6 @@ var ethUtil = require('ethereumjs-util');
 var web3 = undefined;
 var userAccount = undefined;
 var rentforcementContract = undefined;
-var flag = false;
 
 const useStyles = makeStyles((theme) => ({
     appBar: {
@@ -93,6 +92,7 @@ function Profile(props) {
     const [address, setAddress] = useState('');
     const [city, setCity] = useState('');
     const [state, setState] = useState('');
+    const [flag, setFlag] = useState(false);
 
     const validateUser = async () => {
         const nonce = Math.round(Math.random() * 100 + Math.random() * 100);
@@ -128,169 +128,180 @@ function Profile(props) {
 
     useEffect(() => {
 
-        async function preChecks() {
-            const provider = await detectEthereumProvider();
+        let isMounted = true;
 
-            if (provider) {
-    
-                // this.setState({ isMetamaskInstalled: true });
-                setIsMetamaskInstalled(true);
-                if (provider !== window.ethereum) {
-                    // this.setState({ isValid: false })
-                    setIsValid(false);
-                    alert('Multiple wallets are installed!');
-                    return;
-    
-                } else {
-    
-                    console.log('Single wallet!');
-                    // this.setState({ isValid: true });
-                    setIsValid(true);
-                    web3 = new Web3(provider);
-    
-                    // fetch accounts
-                    try {
-                        var accounts = await provider.request({ method: 'eth_requestAccounts' });
-                        accounts = await web3.eth.getAccounts();
-                        userAccount = accounts[0];
-                        console.log('Account fetched: ' + userAccount);
-    
-                        rentforcementContract = new web3.eth.Contract(
-                            abi,
-                            ContractAddress,
-                            { gasPrice: '200000000000', from: userAccount }
-                        );
-    
+        async function preChecks() {
+
+            if (isMounted) {
+
+                const provider = await detectEthereumProvider();
+
+                if (provider) {
+        
+                    // this.setState({ isMetamaskInstalled: true });
+                    setIsMetamaskInstalled(true);
+                    if (provider !== window.ethereum) {
+                        // this.setState({ isValid: false })
+                        setIsValid(false);
+                        alert('Multiple wallets are installed!');
+                        return;
+        
+                    } else {
+        
+                        console.log('Single wallet!');
+                        // this.setState({ isValid: true });
+                        setIsValid(true);
+                        web3 = new Web3(provider);
+        
+                        // fetch accounts
                         try {
-                            var result = await rentforcementContract.methods.checkIfUserExists().call();
-                            console.log('Account fetched(yes/no): ' + result);
-                            flag = true;
-                            if (!result) {
-                                try {
-                                    const isUserValid = await validateUser();
-                                    // this.setState({ isAuth: isUserValid });
-                                    setIsAuth(isUserValid);
-                                } catch (error) {
-                                    console.log('Error: ' + error);
-                                    window.alert('Error in validating user!');
+                            var accounts = await provider.request({ method: 'eth_requestAccounts' });
+                            accounts = await web3.eth.getAccounts();
+                            userAccount = accounts[0];
+                            console.log('Account fetched: ' + userAccount);
+        
+                            rentforcementContract = new web3.eth.Contract(
+                                abi,
+                                ContractAddress,
+                                { gasPrice: '200000000000', from: userAccount }
+                            );
+        
+                            try {
+                                var result = await rentforcementContract.methods.checkIfUserExists().call();
+                                console.log('Account fetched(yes/no): ' + result);
+                                if (!result) {
+                                    try {
+                                        const isUserValid = await validateUser();
+                                        // this.setState({ isAuth: isUserValid });
+                                        setIsAuth(isUserValid);
+                                    } catch (error) {
+                                        console.log('Error: ' + error);
+                                        window.alert('Error in validating user!');
+                                    }
+                                } else {
+                                    // user already validated
+                                    // this.setState({ isAuth: true });
+                                    setIsAuth(true);
                                 }
-                            } else {
-                                // user already validated
-                                // this.setState({ isAuth: true });
-                                setIsAuth(true);
+        
+                            } catch (error) {
+                                console.log('error: ' + error);
+                                console.log('Error in calling check user exists function!');
+                                // window.alert('Error in calling contract function!');
+                                return;
                             }
-    
+        
+                            if (isAuth) {
+        
+                                // contract call for fetching profile!
+                                try {
+        
+                                    var fetchedUserProfile = await rentforcementContract.methods.fetchUserProfle().call();
+                                    console.log('type: ' + typeof fetchedUserProfile);
+                                    console.log(fetchedUserProfile);
+        
+                                    try {
+        
+                                        // case1:
+                                        // if any one field is empty: profile incomplete
+                                        // if redirected or not, stay on page
+        
+                                        // case2:
+                                        // if none field is empty: profile complete
+                                        // if redirected: leave page
+                                        // if not: stay on page
+        
+                                        var isProfileComplete = true;
+        
+                                        if (
+                                            fetchedUserProfile["userName"] === "" || 
+                                            fetchedUserProfile["userEmail"] === "" ||
+                                            fetchedUserProfile["userPhone"] === "" ||
+                                            fetchedUserProfile["userAddress"] === "" ||
+                                            fetchedUserProfile["userCity"] === "" ||
+                                            fetchedUserProfile["userState"] === ""
+                                        ) {
+                                            isProfileComplete = false;
+                                        }
+                                        
+                                        console.log('Profile Completed: ' + isProfileComplete);
+                                        console.log('Fetched profile')
+                                        console.log(fetchedUserProfile);
+                                        setUsername(fetchedUserProfile['userName']);
+                                        setEmailaddress(fetchedUserProfile['userEmail']);
+                                        setContact(fetchedUserProfile['userPhone']);
+                                        setAddress(fetchedUserProfile['userAddress']);
+                                        setCity(fetchedUserProfile['userCity']);
+                                        setState(fetchedUserProfile['userState']);
+        
+                                        /*
+                                        if (isProfileComplete) {
+                                            // if redirected, should go back there again
+                                            // currently, not redirected again
+                                            this.setState({ username: fetchedUserProfile["userName"] });
+                                            this.setState({ emailaddress: fetchedUserProfile["userEmail"] });
+                                            this.setState({ contact: fetchedUserProfile["userPhone"] });
+                                            this.setState({ address: fetchedUserProfile["userAddress"] });
+                                            this.setState({ city: fetchedUserProfile["userCity"] });
+                                            this.setState({ state: fetchedUserProfile["userState"] });
+        
+                                        } else {
+        
+                                            this.setState({ username: fetchedUserProfile["userName"] });
+                                            this.setState({ emailaddress: fetchedUserProfile["userEmail"] });
+                                            this.setState({ contact: fetchedUserProfile["userPhone"] });
+                                            this.setState({ address: fetchedUserProfile["userAddress"] });
+                                            this.setState({ city: fetchedUserProfile["userCity"] });
+                                            this.setState({ state: fetchedUserProfile["userState"] });
+            
+                                        }*/
+        
+                                    } catch (error) {
+                                        // unable to fetch details!
+                                        console.log('Unable to parse details! Error in fetching!');
+                                    }
+        
+                                    /*
+                                    // not implemented in soldity yet!
+                                    if (fetchedUserProfile["isProfileComplete"]) {
+                                        // can skip this page, if called from other page!
+                                        // need to show, if called from profile page
+                                    } else {
+                                        // need to show in any condition
+                                        this.setState()
+                                    }*/
+        
+                                } catch (error) {
+                                    console.log('error: ' + error)
+                                    console.log('Error in calling fetch profile function!');
+                                }
+                            }
+        
                         } catch (error) {
                             console.log('error: ' + error);
-                            console.log('Error in calling check user exists function!');
-                            // window.alert('Error in calling contract function!');
+                            window.alert('Error in fetching accounts!');
                             return;
                         }
-    
-                        if (isAuth) {
-    
-                            // contract call for fetching profile!
-                            try {
-    
-                                var fetchedUserProfile = await rentforcementContract.methods.fetchUserProfle().call();
-                                console.log('type: ' + typeof fetchedUserProfile);
-                                console.log(fetchedUserProfile);
-    
-                                try {
-    
-                                    // case1:
-                                    // if any one field is empty: profile incomplete
-                                    // if redirected or not, stay on page
-    
-                                    // case2:
-                                    // if none field is empty: profile complete
-                                    // if redirected: leave page
-                                    // if not: stay on page
-    
-                                    var isProfileComplete = true;
-    
-                                    if (
-                                        fetchedUserProfile["userName"] === "" || 
-                                        fetchedUserProfile["userEmail"] === "" ||
-                                        fetchedUserProfile["userPhone"] === "" ||
-                                        fetchedUserProfile["userAddress"] === "" ||
-                                        fetchedUserProfile["userCity"] === "" ||
-                                        fetchedUserProfile["userState"] === ""
-                                    ) {
-                                        isProfileComplete = false;
-                                    }
-                                    
-                                    console.log('Profile Completed: ' + isProfileComplete);
-                                    console.log('Fetched profile')
-                                    console.log(fetchedUserProfile);
-                                    setUsername(fetchedUserProfile['userName']);
-                                    setEmailaddress(fetchedUserProfile['userEmail']);
-                                    setContact(fetchedUserProfile['userPhone']);
-                                    setAddress(fetchedUserProfile['userAddress']);
-                                    setCity(fetchedUserProfile['userCity']);
-                                    setState(fetchedUserProfile['userState']);
-    
-                                    /*
-                                    if (isProfileComplete) {
-                                        // if redirected, should go back there again
-                                        // currently, not redirected again
-                                        this.setState({ username: fetchedUserProfile["userName"] });
-                                        this.setState({ emailaddress: fetchedUserProfile["userEmail"] });
-                                        this.setState({ contact: fetchedUserProfile["userPhone"] });
-                                        this.setState({ address: fetchedUserProfile["userAddress"] });
-                                        this.setState({ city: fetchedUserProfile["userCity"] });
-                                        this.setState({ state: fetchedUserProfile["userState"] });
-    
-                                    } else {
-    
-                                        this.setState({ username: fetchedUserProfile["userName"] });
-                                        this.setState({ emailaddress: fetchedUserProfile["userEmail"] });
-                                        this.setState({ contact: fetchedUserProfile["userPhone"] });
-                                        this.setState({ address: fetchedUserProfile["userAddress"] });
-                                        this.setState({ city: fetchedUserProfile["userCity"] });
-                                        this.setState({ state: fetchedUserProfile["userState"] });
         
-                                    }*/
-    
-                                } catch (error) {
-                                    // unable to fetch details!
-                                    console.log('Unable to parse details! Error in fetching!');
-                                }
-    
-                                /*
-                                // not implemented in soldity yet!
-                                if (fetchedUserProfile["isProfileComplete"]) {
-                                    // can skip this page, if called from other page!
-                                    // need to show, if called from profile page
-                                } else {
-                                    // need to show in any condition
-                                    this.setState()
-                                }*/
-    
-                            } catch (error) {
-                                console.log('error: ' + error)
-                                console.log('Error in calling fetch profile function!');
-                            }
-                        }
-    
-                    } catch (error) {
-                        console.log('error: ' + error);
-                        window.alert('Error in fetching accounts!');
-                        return;
                     }
-    
+        
                 }
-    
+                else {
+                    // this.setState({ isMetamaskInstalled: false });
+                    setIsMetamaskInstalled(false);
+                    window.alert('Please install MetaMask!');
+                    return;
+                }
             }
-            else {
-                // this.setState({ isMetamaskInstalled: false });
-                setIsMetamaskInstalled(false);
-                window.alert('Please install MetaMask!');
-                return;
-            }
+
+            // flag = false;
+            setFlag(true);
+
         }
 
         preChecks();
+
+        return() => { isMounted = false };
 
     }, [flag]);
 

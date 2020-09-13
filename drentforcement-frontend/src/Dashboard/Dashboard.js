@@ -1,7 +1,7 @@
 // imports
 import React, { useState, useEffect } from 'react';
 import Web3 from 'web3';
-import { Redirect } from 'react-router-dom';
+import { Redirect, Link as RouterLink } from 'react-router-dom';
 import TextField from '@material-ui/core/TextField';
 import detectEthereumProvider from '@metamask/detect-provider';
 
@@ -136,144 +136,151 @@ function Dashboard(props) {
 
     useEffect(() => {
 
+        let isMounted = true;
+
         async function preChecks() {
-            const provider = await detectEthereumProvider();
 
-            if (provider) {
+            if (isMounted) {
+                const provider = await detectEthereumProvider();
 
-                // this.setState({ isMetamaskInstalled: true });
-                setIsMetamaskInstalled(true);
-                if (provider !== window.ethereum) {
-                    // this.setState({ isValid: false })
-                    setIsValid(false);
-                    alert('Multiple wallets are installed!');
-                    return;
-
-                } else {
-
-                    console.log('Single wallet!');
-                    // this.setState({ isValid: true });
-                    setIsValid(true);
-                    web3 = new Web3(provider);
-
-                    // fetch accounts
-                    try {
-                        var accounts = await provider.request({ method: 'eth_requestAccounts' });
-                        accounts = await web3.eth.getAccounts();
-                        userAccount = accounts[0];
-                        console.log('Account fetched: ' + userAccount);
-
-                        rentforcementContract = new web3.eth.Contract(
-                            abi,
-                            ContractAddress,
-                            { gasPrice: '20000000000', from: userAccount }
-                        );
-
+                if (provider) {
+    
+                    // this.setState({ isMetamaskInstalled: true });
+                    setIsMetamaskInstalled(true);
+                    if (provider !== window.ethereum) {
+                        // this.setState({ isValid: false })
+                        setIsValid(false);
+                        alert('Multiple wallets are installed!');
+                        return;
+    
+                    } else {
+    
+                        console.log('Single wallet!');
+                        // this.setState({ isValid: true });
+                        setIsValid(true);
+                        web3 = new Web3(provider);
+    
+                        // fetch accounts
                         try {
-                            var result = await rentforcementContract.methods.checkIfUserExists().call();
-                            console.log('Account fetched(yes/no): ' + result);
-                            flag = true;
-                            if (!result) {
-                                try {
-                                    // const isUserValid = await this.validateUser();
-                                    // this.setState({ isAuth: isUserValid });
-                                    // this.setState({ isAuth: false });
-                                    // this.setState({ isUserProfileComplete: false })
-                                    setIsAuth(false);
-                                    setIsUserProfileComplete(false);
-
-                                } catch (error) {
-                                    console.log('Error: ' + error);
-                                    window.alert('Error in validating user!');
+                            var accounts = await provider.request({ method: 'eth_requestAccounts' });
+                            accounts = await web3.eth.getAccounts();
+                            userAccount = accounts[0];
+                            console.log('Account fetched: ' + userAccount);
+    
+                            rentforcementContract = new web3.eth.Contract(
+                                abi,
+                                ContractAddress,
+                                { gasPrice: '20000000000', from: userAccount }
+                            );
+    
+                            try {
+                                var result = await rentforcementContract.methods.checkIfUserExists().call();
+                                console.log('Account fetched(yes/no): ' + result);
+                                flag = true;
+                                if (!result) {
+                                    try {
+                                        // const isUserValid = await this.validateUser();
+                                        // this.setState({ isAuth: isUserValid });
+                                        // this.setState({ isAuth: false });
+                                        // this.setState({ isUserProfileComplete: false })
+                                        setIsAuth(false);
+                                        setIsUserProfileComplete(false);
+    
+                                    } catch (error) {
+                                        console.log('Error: ' + error);
+                                        window.alert('Error in validating user!');
+                                    }
+                                } else {
+                                    // user already validated
+                                    // this.setState({ isAuth: true });
+                                    setIsAuth(true);
                                 }
-                            } else {
-                                // user already validated
-                                // this.setState({ isAuth: true });
-                                setIsAuth(true);
+    
+                            } catch (error) {
+                                console.log('error: ' + error);
+                                window.alert('Error in calling contract function!');
+                                return;
                             }
-
+    
+                            // if auth is true
+                            if (isAuth) {
+    
+                                // contract call for fetching profile!
+                                try {
+    
+                                    var fetchedUserProfile = await rentforcementContract.methods.fetchUserProfle().call();
+                                    console.log('type: ' + typeof fetchedUserProfile);
+                                    console.log(fetchedUserProfile);
+    
+                                    try {
+    
+                                        // check if profile is complete
+                                        // if yes, proceed with addition
+                                        // if no, redirect to profile
+    
+                                        var isProfileComplete = true;
+    
+                                        if (
+                                            fetchedUserProfile["userName"] === "" ||
+                                            fetchedUserProfile["userEmail"] === "" ||
+                                            fetchedUserProfile["userPhone"] === "" ||
+                                            fetchedUserProfile["userAddress"] === "" ||
+                                            fetchedUserProfile["userCity"] === "" ||
+                                            fetchedUserProfile["userState"] === ""
+                                        ) {
+                                            isProfileComplete = false;
+                                        }
+    
+                                        console.log('is profile complete: ' + isProfileComplete);
+    
+                                        if (isProfileComplete) {
+                                            // continue with dashboard
+                                            // this.setState({ isUserProfileComplete: true });
+                                            setIsUserProfileComplete(true);
+    
+                                            // fetch products
+                                            await fetchAllProducts();
+    
+                                        } else {
+                                            // redirect to profile
+                                            // this.setState({ isUserProfileComplete: false });
+                                            setIsUserProfileComplete(false);
+                                        }
+    
+    
+                                    } catch (error) {
+                                        // unable to fetch details!
+                                        console.log('Unable to parse details! Error in fetching!');
+                                    }
+    
+    
+                                } catch (error) {
+                                    console.log('error: ' + error)
+                                    console.log('Error in calling fetch profile function!');
+                                }
+                            }
+    
                         } catch (error) {
                             console.log('error: ' + error);
-                            window.alert('Error in calling contract function!');
+                            window.alert('Error in fetching accounts!');
                             return;
                         }
-
-                        // if auth is true
-                        if (isAuth) {
-
-                            // contract call for fetching profile!
-                            try {
-
-                                var fetchedUserProfile = await rentforcementContract.methods.fetchUserProfle().call();
-                                console.log('type: ' + typeof fetchedUserProfile);
-                                console.log(fetchedUserProfile);
-
-                                try {
-
-                                    // check if profile is complete
-                                    // if yes, proceed with addition
-                                    // if no, redirect to profile
-
-                                    var isProfileComplete = true;
-
-                                    if (
-                                        fetchedUserProfile["userName"] === "" ||
-                                        fetchedUserProfile["userEmail"] === "" ||
-                                        fetchedUserProfile["userPhone"] === "" ||
-                                        fetchedUserProfile["userAddress"] === "" ||
-                                        fetchedUserProfile["userCity"] === "" ||
-                                        fetchedUserProfile["userState"] === ""
-                                    ) {
-                                        isProfileComplete = false;
-                                    }
-
-                                    console.log('is profile complete: ' + isProfileComplete);
-
-                                    if (isProfileComplete) {
-                                        // continue with dashboard
-                                        // this.setState({ isUserProfileComplete: true });
-                                        setIsUserProfileComplete(true);
-
-                                        // fetch products
-                                        await fetchAllProducts();
-
-                                    } else {
-                                        // redirect to profile
-                                        // this.setState({ isUserProfileComplete: false });
-                                        setIsUserProfileComplete(false);
-                                    }
-
-
-                                } catch (error) {
-                                    // unable to fetch details!
-                                    console.log('Unable to parse details! Error in fetching!');
-                                }
-
-
-                            } catch (error) {
-                                console.log('error: ' + error)
-                                console.log('Error in calling fetch profile function!');
-                            }
-                        }
-
-                    } catch (error) {
-                        console.log('error: ' + error);
-                        window.alert('Error in fetching accounts!');
-                        return;
+    
                     }
-
+    
                 }
-
-            }
-            else {
-                // this.setState({ isMetamaskInstalled: false });
-                setIsMetamaskInstalled(false);
-                window.alert('Please install MetaMask!');
-                return;
+                else {
+                    // this.setState({ isMetamaskInstalled: false });
+                    setIsMetamaskInstalled(false);
+                    window.alert('Please install MetaMask!');
+                    return;
+                }
             }
         }
-        
+
         preChecks();
+
+        return() => { isMounted = false };
 
     }, [flag]);
 
@@ -366,12 +373,20 @@ function Dashboard(props) {
                                         <Typography>
                                             {product.productDesc}
                                         </Typography>
+                                        <Typography>
+                                            {product.productPrice / Math.pow(10, 18)}
+                                        </Typography>
                                     </CardContent>
                                     
                                     <CardActions>
+                                        <RouterLink to={{
+                                            pathname: '/order',
+                                            state: product.productId
+                                        }}>
                                         <Button size="small" color="primary">
                                             Borrow
                                         </Button>
+                                        </RouterLink>
                                     </CardActions>
                                 </Card>
                             </Grid>

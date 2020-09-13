@@ -122,133 +122,141 @@ function ProductAdd(props) {
 
     useEffect(() => {
 
+        let isMounted = true;
+
         async function preChecks() {
-            const provider = await detectEthereumProvider();
 
-            if (provider) {
+            if (isMounted) {
 
-                // this.setState({ isMetamaskInstalled: true });
-                setIsMetamaskInstalled(true);
-                if (provider !== window.ethereum) {
-                    // this.setState({ isValid: false })
-                    setIsValid(false);
-                    alert('Multiple wallets are installed!');
-                    return;
+                const provider = await detectEthereumProvider();
 
-                } else {
-
-                    console.log('Single wallet!');
-                    // this.setState({ isValid: true });
-                    setIsValid(true);
-                    web3 = new Web3(provider);
-
-                    // fetch accounts
-                    try {
-                        var accounts = await provider.request({ method: 'eth_requestAccounts' });
-                        accounts = await web3.eth.getAccounts();
-                        userAccount = accounts[0];
-                        console.log('Account fetched: ' + userAccount);
-
-                        rentforcementContract = new web3.eth.Contract(
-                            abi,
-                            ContractAddress,
-                            { gasPrice: '20000000000', from: userAccount }
-                        );
-
+                if (provider) {
+    
+                    // this.setState({ isMetamaskInstalled: true });
+                    setIsMetamaskInstalled(true);
+                    if (provider !== window.ethereum) {
+                        // this.setState({ isValid: false })
+                        setIsValid(false);
+                        alert('Multiple wallets are installed!');
+                        return;
+    
+                    } else {
+    
+                        console.log('Single wallet!');
+                        // this.setState({ isValid: true });
+                        setIsValid(true);
+                        web3 = new Web3(provider);
+    
+                        // fetch accounts
                         try {
-                            var result = await rentforcementContract.methods.checkIfUserExists().call();
-                            console.log('Account fetched(yes/no): ' + result);
-                            flag = true;
-                            if (!result) {
-                                // redirect user to profile page
-                                // for validation
-                                // and profile completion
-                                // this.setState({ isAuth: false });
-                                // this.setState({ isUserProfileComplete: false });
-                                setIsAuth(false);
-                                setIsUserProfileComplete(false);
-                            } else {
-                                // user already validated
-                                // this.setState({ isAuth: true });
-                                setIsAuth(true);
+                            var accounts = await provider.request({ method: 'eth_requestAccounts' });
+                            accounts = await web3.eth.getAccounts();
+                            userAccount = accounts[0];
+                            console.log('Account fetched: ' + userAccount);
+    
+                            rentforcementContract = new web3.eth.Contract(
+                                abi,
+                                ContractAddress,
+                                { gasPrice: '20000000000', from: userAccount }
+                            );
+    
+                            try {
+                                var result = await rentforcementContract.methods.checkIfUserExists().call();
+                                console.log('Account fetched(yes/no): ' + result);
+                                flag = true;
+                                if (!result) {
+                                    // redirect user to profile page
+                                    // for validation
+                                    // and profile completion
+                                    // this.setState({ isAuth: false });
+                                    // this.setState({ isUserProfileComplete: false });
+                                    setIsAuth(false);
+                                    setIsUserProfileComplete(false);
+                                } else {
+                                    // user already validated
+                                    // this.setState({ isAuth: true });
+                                    setIsAuth(true);
+                                }
+    
+                            } catch (error) {
+                                console.log('error: ' + error);
+                                console.log('Error in calling check user exists function!');
+                                // window.alert('Error in calling contract function!');
+                                return;
                             }
-
+    
+                            if (isAuth) {
+    
+                                // contract call for fetching profile!
+                                try {
+    
+                                    var fetchedUserProfile = await rentforcementContract.methods.fetchUserProfle().call();
+                                    console.log('type: ' + typeof fetchedUserProfile);
+                                    console.log(fetchedUserProfile);
+    
+                                    try {
+    
+                                        // check if profile is complete
+                                        // if yes, proceed with addition
+                                        // if no, redirect to profile
+    
+                                        var isProfileComplete = true;
+    
+                                        if (
+                                            fetchedUserProfile["userName"] === "" ||
+                                            fetchedUserProfile["userEmail"] === "" ||
+                                            fetchedUserProfile["userPhone"] === "" ||
+                                            fetchedUserProfile["userAddress"] === "" ||
+                                            fetchedUserProfile["userCity"] === "" ||
+                                            fetchedUserProfile["userState"] === ""
+                                        ) {
+                                            isProfileComplete = false;
+                                        }
+    
+                                        if (isProfileComplete) {
+                                            // continue with product add form!
+                                            // this.setState({ isUserProfileComplete: true });
+                                            setIsUserProfileComplete(true);
+                                        } else {
+                                            // redirect to profile
+                                            // this.setState({ isUserProfileComplete: false });
+                                            setIsUserProfileComplete(false);
+                                        }
+    
+    
+                                    } catch (error) {
+                                        // unable to fetch details!
+                                        console.log('Unable to parse details! Error in fetching!');
+                                    }
+    
+    
+                                } catch (error) {
+                                    console.log('error: ' + error)
+                                    console.log('Error in calling fetch profile function!');
+                                }
+                            }
+    
                         } catch (error) {
                             console.log('error: ' + error);
-                            console.log('Error in calling check user exists function!');
-                            // window.alert('Error in calling contract function!');
+                            window.alert('Error in fetching accounts!');
                             return;
                         }
-
-                        if (isAuth) {
-
-                            // contract call for fetching profile!
-                            try {
-
-                                var fetchedUserProfile = await rentforcementContract.methods.fetchUserProfle().call();
-                                console.log('type: ' + typeof fetchedUserProfile);
-                                console.log(fetchedUserProfile);
-
-                                try {
-
-                                    // check if profile is complete
-                                    // if yes, proceed with addition
-                                    // if no, redirect to profile
-
-                                    var isProfileComplete = true;
-
-                                    if (
-                                        fetchedUserProfile["userName"] === "" ||
-                                        fetchedUserProfile["userEmail"] === "" ||
-                                        fetchedUserProfile["userPhone"] === "" ||
-                                        fetchedUserProfile["userAddress"] === "" ||
-                                        fetchedUserProfile["userCity"] === "" ||
-                                        fetchedUserProfile["userState"] === ""
-                                    ) {
-                                        isProfileComplete = false;
-                                    }
-
-                                    if (isProfileComplete) {
-                                        // continue with product add form!
-                                        // this.setState({ isUserProfileComplete: true });
-                                        setIsUserProfileComplete(true);
-                                    } else {
-                                        // redirect to profile
-                                        // this.setState({ isUserProfileComplete: false });
-                                        setIsUserProfileComplete(false);
-                                    }
-
-
-                                } catch (error) {
-                                    // unable to fetch details!
-                                    console.log('Unable to parse details! Error in fetching!');
-                                }
-
-
-                            } catch (error) {
-                                console.log('error: ' + error)
-                                console.log('Error in calling fetch profile function!');
-                            }
-                        }
-
-                    } catch (error) {
-                        console.log('error: ' + error);
-                        window.alert('Error in fetching accounts!');
-                        return;
+    
                     }
-
+    
                 }
-
-            }
-            else {            
-                // this.setState({ isMetamaskInstalled: false });
-                setIsMetamaskInstalled(false);
-                window.alert('Please install MetaMask!');
-                return;
+                else {            
+                    // this.setState({ isMetamaskInstalled: false });
+                    setIsMetamaskInstalled(false);
+                    window.alert('Please install MetaMask!');
+                    return;
+                }
             }
         }
 
         preChecks();
+
+        return() => { isMounted = false };
 
     }, [flag]);
 

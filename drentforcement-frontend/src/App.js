@@ -9,6 +9,7 @@ import Auth from './Auth/Auth';
 import Test from './Test/Test';
 import Profile from './Profile/Profile';
 import ProductAdd from './Product/ProductAdd';
+import Order from './Dashboard/Order/Order';
 import Error from './Error/Error';
 
 class App extends Component {
@@ -23,6 +24,7 @@ class App extends Component {
             <Route exact path="/auth" component={Auth} />
             <Route exact path="/profile" component={Profile} />
             <Route exact path="/add" component={ProductAdd} />
+            <Route exact path="/order" component={Order} />
             {/* <Route exact path="/test" component={Test} /> */}
             <Route exact path="/error" component={Error} />
             <Redirect to="/error" />
