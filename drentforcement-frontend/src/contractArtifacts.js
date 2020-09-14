@@ -1,5 +1,5 @@
 module.exports = {
-  ContractAddress: "0xC990e0604b4a61449b52934702270f252111edBA",
+  ContractAddress: "0x8718E42a784937AD2216317245C50EB5F9979a97",
   abi: [
 	{
 		"inputs": [
@@ -30,6 +30,136 @@ module.exports = {
 			}
 		],
 		"name": "addProductOnRent",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_userName",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_userEmail",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_userPhone",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_userAddress",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_userCity",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_userState",
+				"type": "string"
+			}
+		],
+		"name": "createNewUser",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_productId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "startDate",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "numberOfDays",
+				"type": "uint256"
+			}
+		],
+		"name": "placeOrder",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "x",
+				"type": "uint256"
+			}
+		],
+		"name": "setDummy",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_userName",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_userEmail",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_userPhone",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_userAddress",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_userCity",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_userState",
+				"type": "string"
+			}
+		],
+		"name": "updateUser",
 		"outputs": [
 			{
 				"internalType": "bool",
@@ -80,50 +210,6 @@ module.exports = {
 			}
 		],
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "_userName",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "_userEmail",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "_userPhone",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "_userAddress",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "_userCity",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "_userState",
-				"type": "string"
-			}
-		],
-		"name": "createNewUser",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -306,6 +392,138 @@ module.exports = {
 				"internalType": "struct Rentforcement.Product[]",
 				"name": "",
 				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_productId",
+				"type": "uint256"
+			}
+		],
+		"name": "fetchOwnerOfProduct",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "address",
+						"name": "userAccountAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "string",
+						"name": "userName",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "userEmail",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "userPhone",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "userAddress",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "userCity",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "userState",
+						"type": "string"
+					},
+					{
+						"internalType": "bool",
+						"name": "isValid",
+						"type": "bool"
+					}
+				],
+				"internalType": "struct Rentforcement.User",
+				"name": "",
+				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_id",
+				"type": "uint256"
+			}
+		],
+		"name": "fetchProductFromId",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "productId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "productName",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "productDesc",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "productPrice",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "productImage",
+						"type": "string"
+					},
+					{
+						"internalType": "address",
+						"name": "productOwner",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "productPeriod",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "lastDateAvailable",
+						"type": "uint256"
+					},
+					{
+						"internalType": "bool",
+						"name": "isAvailableNow",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool[]",
+						"name": "isNotAvailable",
+						"type": "bool[]"
+					}
+				],
+				"internalType": "struct Rentforcement.Product",
+				"name": "",
+				"type": "tuple"
 			}
 		],
 		"stateMutability": "view",
@@ -526,29 +744,6 @@ module.exports = {
 		"type": "function"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_productId",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "startDate",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "numberOfDays",
-				"type": "uint256"
-			}
-		],
-		"name": "placeOrder",
-		"outputs": [],
-		"stateMutability": "payable",
-		"type": "function"
-	},
-	{
 		"inputs": [],
 		"name": "productId",
 		"outputs": [
@@ -618,63 +813,6 @@ module.exports = {
 			}
 		],
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "x",
-				"type": "uint256"
-			}
-		],
-		"name": "setDummy",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "_userName",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "_userEmail",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "_userPhone",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "_userAddress",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "_userCity",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "_userState",
-				"type": "string"
-			}
-		],
-		"name": "updateUser",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{

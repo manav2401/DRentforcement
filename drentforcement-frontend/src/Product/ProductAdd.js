@@ -478,18 +478,18 @@ function ProductAdd(props) {
                                         </Button>
                                         </RouterLink>
                                     </Grid>
-                                    <Grid item>
+                                    {/*<Grid item>
                                         <RouterLink to='/add'>
                                         <Button 
                                             variant="outlined"
                                             color="primary"
                                             component={RouterLink}
-                                            to={'/'}
+                                            to={'/add'}
                                         >
-                                            View your products
+                                            Add another product
                                         </Button>
                                         </RouterLink>
-                                    </Grid>
+                                    </Grid> */}
                                 </Grid>
                                 </div>
                             </div>

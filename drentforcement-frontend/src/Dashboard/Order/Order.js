@@ -25,10 +25,6 @@ import {
 } from '@material-ui/pickers';
 import { ContractAddress, abi } from '../../contractArtifacts';
 
-var web3 = undefined;
-var userAccount = undefined;
-var rentforcementContract = undefined;
-
 
   const useStyles = makeStyles((theme) => ({
     appBar: {
@@ -86,8 +82,8 @@ export default function Order(props) {
 
     const classes = useStyles();
 
-    const [productId, setProductId] = useState(props.location.state);
-    // const [rentforcementContract, setRentforcementContract] = useState(props.location.state)
+    const [productId, setProductId] = useState(props.location.id);
+    const [rentforcementContract, setRentforcementContract] = useState(props.location.instance)
     const [isValid, setIsValid] = useState(productId == undefined ? false : true);
     const [startDate, setStartDate] = useState(new Date());
     const [endDate, setEndDate] = useState(new Date());
@@ -130,9 +126,12 @@ export default function Order(props) {
         var eDate = new Date(endDate);
         console.log('start date: ' + stDate);
         console.log('end date: ' + eDate);
-        var numberOfDays = Math.ceil(Math.abs((eDate.getTime() - stDate.getTime()) / (1000*3600*24)));
+        setStartDate(stDate);
+        setEndDate(eDate);
+        var numberOfDays = (Math.ceil(Math.abs((eDate.getTime() - stDate.getTime() + 86400000) / (1000*3600*24))))
 
         // instantiate contract
+        /*
         try {
             var provider = await detectEthereumProvider();
             web3 = new Web3(provider);
@@ -147,10 +146,10 @@ export default function Order(props) {
             );    
         } catch(err) {
             console.log('Error in instantiating contract: ' + err);
-        }
+        }*/
 
+        var result = false;
         try {
-            var result = false;
             var result = await rentforcementContract.methods.checkAvailability(
                 productId,
                 parseInt(stDate.getTime() / 1000),
@@ -284,12 +283,14 @@ export default function Order(props) {
                                 ? 
                                 <RouterLink to={{
                                     pathname: '/checkout',
-                                    state: productId, startDate, endDate
+                                    id: productId, 
+                                    startDate: startDate,
+                                    endDate: endDate,
+                                    instance: rentforcementContract
                                 }}>
                                 <Button 
                                     variant="outlined"
                                     color="primary"
-                                    component={RouterLink}
                                     to={'/checkout'}
                                 >
                                     Proceed
@@ -318,7 +319,13 @@ export default function Order(props) {
         )
     } else {
         return(
-            <div><h3>Sorry, there is an error fetching the product! Please visit dashboard!</h3></div>
+            <div>
+                <React.Fragment>
+                    <Typography component="h1" variant="h5" align="center">
+                        Sorry, there is an error fetching the product! Please visit dashboard!
+                    </Typography>
+                </React.Fragment>
+            </div>
         )
     }
 

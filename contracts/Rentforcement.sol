@@ -333,12 +333,12 @@ contract Rentforcement {
     
     function makePayment(address beneficiary, uint256 value) internal {
         // make payment
-        address dummybeneficiary = beneficiary;
-        dummybeneficiary = 0xED0E32B5E67F2785F90b70c42296Ee89d5f39160;
-        address(uint160(dummybeneficiary)).transfer(value);
+        // address dummybeneficiary = beneficiary;
+        // dummybeneficiary = 0xED0E32B5E67F2785F90b70c42296Ee89d5f39160;
+        address(uint160(beneficiary)).transfer(value);
     }
 
-    function placeOrder(uint256 _productId, uint256 startDate, uint256 numberOfDays) public payable {
+    function placeOrder(uint256 _productId, uint256 startDate, uint256 numberOfDays) public payable returns(bool) {
 
         uint256 price = products[_productId].productPrice * numberOfDays;
 
@@ -351,12 +351,13 @@ contract Rentforcement {
         );
 
         // transfer funds
-        makePayment(msg.sender, price);
+        makePayment(products[_productId].productOwner, price);
 
         // all conditions fulfilled and funds transferred!
         // create new order
 
         createOrder(_productId, msg.sender, price, depositAmount, startDate, numberOfDays);
+        return true;
 
     }
 
@@ -466,6 +467,10 @@ contract Rentforcement {
 
     }
 
+    function fetchProductFromId(uint256 _id) public view returns(Product memory) {
+        return products[_id];
+    }
+
     // function to check whether user exists or not
     function checkIfUserExists() external view returns (bool) {
         return users[msg.sender].isValid;
@@ -487,6 +492,11 @@ contract Rentforcement {
     // fetch a particular user profile
     function fetchUserProfle() external view returns (User memory) {
         return users[msg.sender];
+    }
+
+    // fetch a particular user profile
+    function fetchOwnerOfProduct(uint256 _productId) external view returns(User memory) {
+        return users[products[_productId].productOwner];
     }
 
     // dummy functions for testing!

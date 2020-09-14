@@ -326,21 +326,6 @@ function Dashboard(props) {
                 A Decentralized C2C Renting Platform!
             </Typography>
 
-            {/* buttons to be added here */}
-            {/* <div className={classes.heroButtons}> */}
-            {/* <Grid container spacing={2} justify="center"> */}
-            {/* <Grid item> */}
-            {/* <Button variant="contained" color="primary"> */}
-            {/* Main call to action */}
-            {/* </Button> */}
-            {/* </Grid> */}
-            {/* <Grid item> */}
-            {/* <Button variant="outlined" color="primary"> */}
-            {/* Secondary action */}
-            {/* </Button> */}
-            {/* </Grid> */}
-            {/* </Grid> */}
-            {/* </div> */}
 
         </Container>
     )
@@ -355,6 +340,26 @@ function Dashboard(props) {
                     <main>
                         <div className={classes.heroContent}>
                             {Body}
+
+                            <div className={classes.heroButtons}>
+                            <Grid container spacing={2} justify="center">
+                                <Grid item>
+                                <RouterLink to='/add'>
+                                <Button variant="outlined" color="primary" component={RouterLink} to={'/add'}>
+                                    Add product on rent
+                                </Button>
+                                </RouterLink>
+                                </Grid>
+                                <Grid item>
+                                <RouterLink to='/profile'>
+                                <Button variant="outlined" color="primary" component={RouterLink} to={'/profile'}>
+                                    Profile
+                                </Button>
+                                </RouterLink>
+                                </Grid>
+                            </Grid>
+                            </div>
+
                         </div>
                         <Container className={classes.cardGrid} maxWidth="md">
                         <Grid container spacing={4}>
@@ -374,16 +379,21 @@ function Dashboard(props) {
                                             {product.productDesc}
                                         </Typography>
                                         <Typography>
-                                            {product.productPrice / Math.pow(10, 18)}
+                                            {product.productPrice / Math.pow(10, 18)} ETH per day
                                         </Typography>
                                     </CardContent>
                                     
                                     <CardActions>
                                         <RouterLink to={{
                                             pathname: '/order',
-                                            state: product.productId
+                                            id: product.productId,
+                                            instance: rentforcementContract
                                         }}>
-                                        <Button size="small" color="primary">
+                                        <Button 
+                                            size="small"
+                                            color="primary"
+                                            variant="contained"
+                                            to={'/order'}>
                                             Borrow
                                         </Button>
                                         </RouterLink>
